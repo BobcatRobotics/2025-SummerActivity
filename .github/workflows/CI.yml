@@ -31,3 +31,32 @@ jobs:
     # Grant execute permission for gradlew
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+
+    - name: Run Checkstyle
+      run: ./gradlew checkstyleMain
+
+    - name: Upload Checkstyle report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: checkstyle-report
+        path: build/reports/checkstyle/
+
+    # Runs a single command using the runners shell
+    - name: Compile robot code
+      run: ./gradlew build
+
+    # Runs a single command using the runners shell
+    - name: Compile and run tests on robot code
+      run: ./gradlew test
+
+    # Runs a single command to generate docs of your code
+    - name: Generate Docs
+      run: ./gradlew javadoc
+
+    - name: Upload Javadocs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: javadocs-report
+        path: build/docs/javadoc
