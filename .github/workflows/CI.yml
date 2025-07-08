@@ -54,3 +54,10 @@ jobs:
     - name: Generate Docs
       run: ./gradlew javadoc
 
+    - name: Upload Javadocs
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: javadocs-report
+        path: build/docs/javadoc
+
