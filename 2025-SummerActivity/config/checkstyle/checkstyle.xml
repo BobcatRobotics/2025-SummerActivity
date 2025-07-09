@@ -48,10 +48,8 @@
     <module name="MethodName"/>
     <module name="ParameterName"/>
     <module name="LocalVariableName"/>
-    <module name="MemberName"/>
     <module name="StaticVariableName"/>
     <module name="PackageName"/>
     <module name="TypeName"/>
-    <module name="ConstantName"/>
   </module>
 </module>
