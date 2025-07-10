@@ -60,4 +60,3 @@ jobs:
       with:
         name: javadocs-report
         path: build/docs/javadoc
-
