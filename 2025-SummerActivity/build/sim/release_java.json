@@ -1,0 +1,21 @@
+[
+  {
+    "type": "java",
+    "name": "jar (in project 2025-SummerActivity)",
+    "extensions": [
+      {
+        "name": "Sim GUI",
+        "libName": "/Users/ao/Documents/GitHub/BobcatRobotics/2025-SummerActivity/2025-SummerActivity/build/jni/release/libhalsim_gui.dylib",
+        "defaultEnabled": false
+      },
+      {
+        "name": "Use Real DriverStation",
+        "libName": "/Users/ao/Documents/GitHub/BobcatRobotics/2025-SummerActivity/2025-SummerActivity/build/jni/release/libhalsim_ds_socket.dylib",
+        "defaultEnabled": false
+      }
+    ],
+    "environment": {},
+    "libraryDir": "/Users/ao/Documents/GitHub/BobcatRobotics/2025-SummerActivity/2025-SummerActivity/build/jni/release",
+    "mainClassName": "frc.robot.Main"
+  }
+]
