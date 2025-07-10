@@ -106,7 +106,7 @@ tasks.withType(JavaCompile) {
 
 checkstyle {
     configFile = file("config/checkstyle/checkstyle.xml")
-     toolVersion = '10.3.4' // or current latest
+     toolVersion = '10.26.1' // or current latest
 }
 
 tasks.withType(Checkstyle) {
