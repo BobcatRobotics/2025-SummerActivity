@@ -125,9 +125,7 @@ public class PhoenixOdometryThread extends Thread {
           // that is not CAN FD, regardless of Pro licensing. No reasoning for this
           // behavior is provided by the documentation.
           Thread.sleep((long) (1000.0 / Drive.ODOMETRY_FREQUENCY));
-          if (phoenixSignals.length > 0) {
-            BaseStatusSignal.refreshAll(phoenixSignals);
-          }
+          if (phoenixSignals.length > 0) BaseStatusSignal.refreshAll(phoenixSignals);
         }
       } catch (InterruptedException e) {
         e.printStackTrace();
@@ -139,8 +137,8 @@ public class PhoenixOdometryThread extends Thread {
       Drive.odometryLock.lock();
       try {
         // Sample timestamp is current FPGA time minus average CAN latency
-        // Default timestamps from Phoenix are NOT compatible with
-        // FPGA timestamps, this solution is imperfect but close
+        //     Default timestamps from Phoenix are NOT compatible with
+        //     FPGA timestamps, this solution is imperfect but close
         double timestamp = RobotController.getFPGATime() / 1e6;
         double totalLatency = 0.0;
         for (BaseStatusSignal signal : phoenixSignals) {
