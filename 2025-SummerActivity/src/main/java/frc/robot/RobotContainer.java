@@ -20,10 +20,12 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.RollerSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -47,6 +49,14 @@ public class RobotContainer {
 
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
+
+  // Roller Subsystem + Commands
+  public final RollerSubsystem m_roller = new RollerSubsystem();
+  public Command rollerInCommand =
+      new InstantCommand(() -> m_roller.runRoller(Constants.RollerConstants.ROLLER_SPEED_IN));
+  public Command rollerOutCommand =
+      new InstantCommand(() -> m_roller.runRoller(Constants.RollerConstants.ROLLER_SPEED_OUT));
+  public Command rollerStopCommand = new InstantCommand(() -> m_roller.stopRoller());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -146,6 +156,9 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    controller.leftBumper().whileTrue(rollerInCommand).onFalse(rollerStopCommand);
+    controller.rightBumper().whileTrue(rollerOutCommand).onFalse(rollerStopCommand);
   }
 
   /**

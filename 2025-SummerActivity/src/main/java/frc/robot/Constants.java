@@ -34,4 +34,12 @@ public final class Constants {
     /** Replaying from a log file. */
     REPLAY
   }
+
+  public static final class RollerConstants {
+    public static final int ROLLER_MOTOR_ID = 10;
+    public static final int ROLLER_MOTOR_CURRENT_LIMIT = 60;
+    public static final double ROLLER_MOTOR_VOLTAGE_COMP = 10;
+    public static final double ROLLER_SPEED_OUT = 8;
+    public static final double ROLLER_SPEED_IN = -8;
+  }
 }
