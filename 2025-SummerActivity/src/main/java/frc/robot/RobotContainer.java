@@ -23,7 +23,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
+import frc.robot.commands.SetRollerSpeed;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Roller;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -41,6 +43,10 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Roller roller = new Roller();
+
+  private final SetRollerSpeed setRollerFullSpeed = new SetRollerSpeed(roller, 1);
+  private final SetRollerSpeed setRollerReverseFullSpeed = new SetRollerSpeed(roller, -1);
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -146,6 +152,12 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    // Run roller forward when right trigger is pressed
+    controller.rightTrigger().whileTrue(setRollerFullSpeed);
+
+    // Run roller backward when left trigger is pressed
+    controller.leftTrigger().whileTrue(setRollerReverseFullSpeed);
   }
 
   /**
