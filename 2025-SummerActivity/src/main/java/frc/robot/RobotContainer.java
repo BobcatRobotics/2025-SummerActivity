@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SetRollerSpeed;
+import frc.robot.commands.StopRoller;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Roller;
 import frc.robot.subsystems.drive.Drive;
@@ -47,6 +48,7 @@ public class RobotContainer {
 
   private final SetRollerSpeed setRollerFullSpeed = new SetRollerSpeed(roller, 1);
   private final SetRollerSpeed setRollerReverseFullSpeed = new SetRollerSpeed(roller, -1);
+  private final StopRoller stopRoller = new StopRoller(roller);
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -154,10 +156,10 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     // Run roller forward when right trigger is pressed
-    controller.rightTrigger().whileTrue(setRollerFullSpeed);
+    controller.rightTrigger().whileTrue(setRollerFullSpeed).onFalse(stopRoller);
 
     // Run roller backward when left trigger is pressed
-    controller.leftTrigger().whileTrue(setRollerReverseFullSpeed);
+    controller.leftTrigger().whileTrue(setRollerReverseFullSpeed).onFalse(setRollerFullSpeed);
   }
 
   /**
