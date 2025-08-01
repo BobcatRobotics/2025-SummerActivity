@@ -5,19 +5,17 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.Roller;
+import frc.robot.subsystems.Arm;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class SetRollerSpeed extends Command {
-  private Roller roller;
-  private double speed;
+public class ArmOut extends Command {
+  private Arm arm;
 
-  /** Creates a new SetRollerSpeed. */
-  public SetRollerSpeed(Roller roller, double speed) {
-    this.roller = roller;
-    this.speed = speed;
+  /** Creates a new ArmOut. */
+  public ArmOut(Arm arm) {
+    this.arm = arm;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(roller);
+    addRequirements(arm);
   }
 
   // Called when the command is initially scheduled.
@@ -27,7 +25,7 @@ public class SetRollerSpeed extends Command {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    roller.setSpeed(speed);
+    arm.armOut();
   }
 
   // Called once the command ends or is interrupted.

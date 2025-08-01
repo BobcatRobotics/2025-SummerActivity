@@ -22,10 +22,14 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.commands.ArmIn;
+import frc.robot.commands.ArmOut;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.SetRollerSpeed;
+import frc.robot.commands.StopArm;
 import frc.robot.commands.StopRoller;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Roller;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -45,10 +49,14 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Roller roller = new Roller();
+  private final Arm arm = new Arm();
 
   private final SetRollerSpeed setRollerFullSpeed = new SetRollerSpeed(roller, 1);
   private final SetRollerSpeed setRollerReverseFullSpeed = new SetRollerSpeed(roller, -1);
   private final StopRoller stopRoller = new StopRoller(roller);
+  private final ArmIn armIn = new ArmIn(arm);
+  private final ArmOut armOut = new ArmOut(arm);
+  private final StopArm stopArm = new StopArm(arm);
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -160,6 +168,12 @@ public class RobotContainer {
 
     // Run roller backward when left trigger is pressed
     controller.leftTrigger().whileTrue(setRollerReverseFullSpeed).onFalse(setRollerFullSpeed);
+
+    // Run arm forward when right bumper is pressed
+    controller.rightBumper().whileTrue(armIn).onFalse(stopArm);
+
+    // Run arm backward when left bumper is pressed
+    controller.leftBumper().whileTrue(armOut).onFalse(stopArm);
   }
 
   /**
