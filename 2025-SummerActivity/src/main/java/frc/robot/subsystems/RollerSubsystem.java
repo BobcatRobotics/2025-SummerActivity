@@ -1,6 +1,5 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -10,8 +9,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RollerConstants;
 
 public class RollerSubsystem extends SubsystemBase {
-  final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
   private final TalonFX rollerMotor;
+  final VelocityVoltage m_VelocityVoltage = new VelocityVoltage(0).withSlot(0);
 
   public RollerSubsystem() {
 
@@ -25,11 +24,10 @@ public class RollerSubsystem extends SubsystemBase {
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = RollerConstants.ROLLER_MOTOR_CURRENT_LIMIT;
 
-    var slot0Configs = new Slot0Configs();
-    slot0Configs.kP = 0.11;
-    slot0Configs.kI = 0;
-    slot0Configs.kD = 0;
-    config.Slot0 = slot0Configs;
+    //Velocity PIDs
+    config.Slot0.kP = 0.11; //TODO tune this
+    config.Slot0.kI = 0;
+    config.Slot0.kD = 0;
     rollerMotor.getConfigurator().apply(config);
   }
 
@@ -43,8 +41,7 @@ public class RollerSubsystem extends SubsystemBase {
    * @param speed motor speed from -1.0 to 1, with 0 stopping it
    */
   public void runRoller(double speed) {
-    // create a velocity closed-loop request, voltage output, slot 0 configs
-    rollerMotor.setControl(m_request.withVelocity(speed));
+    rollerMotor.setControl(m_VelocityVoltage.withVelocity(speed));
   }
 
   public void stopRoller() {

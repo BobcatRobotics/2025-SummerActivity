@@ -42,4 +42,17 @@ public final class Constants {
     public static final double ROLLER_SPEED_OUT = 8;
     public static final double ROLLER_SPEED_IN = -8;
   }
+
+  public static final class ArmConstants {
+    public static final int ARM_MOTOR_ID = 9;
+    public static final int ARM_MOTOR_CURRENT_LIMIT = 10;
+    public static final double ARM_MOTOR_VOLTAGE_COMP = 10;
+    public static final double ARM_SPEED_DOWN = 0.177;
+    public static final double ARM_SPEED_UP = -0.19;
+    // public static final double ARM_HOLD_DOWN = 0.1;
+    // public static final double ARM_HOLD_UP = -0.15;
+    public static final int ARM_SWITCH_PORT = 0;
+    public static final double ARM_MOTOR_STATOR_CURRENT_LIMIT = 10;
+    public static final double ARM_PID_POSITION = 10;
+  }
 }
