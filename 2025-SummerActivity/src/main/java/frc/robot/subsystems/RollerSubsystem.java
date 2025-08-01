@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.RollerConstants;
 
 public class RollerSubsystem extends SubsystemBase {
-
+  final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
   private final TalonFX rollerMotor;
 
   public RollerSubsystem() {
@@ -24,16 +24,13 @@ public class RollerSubsystem extends SubsystemBase {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = RollerConstants.ROLLER_MOTOR_CURRENT_LIMIT;
-    rollerMotor.getConfigurator().apply(config);
 
     var slot0Configs = new Slot0Configs();
-    slot0Configs.kS = 0.1;
-    slot0Configs.kV = 0.12;
     slot0Configs.kP = 0.11;
     slot0Configs.kI = 0;
     slot0Configs.kD = 0;
-
-    rollerMotor.getConfigurator().apply(slot0Configs);
+    config.Slot0 = slot0Configs;
+    rollerMotor.getConfigurator().apply(config);
   }
 
   @Override
@@ -47,7 +44,6 @@ public class RollerSubsystem extends SubsystemBase {
    */
   public void runRoller(double speed) {
     // create a velocity closed-loop request, voltage output, slot 0 configs
-    final VelocityVoltage m_request = new VelocityVoltage(0).withSlot(0);
     rollerMotor.setControl(m_request.withVelocity(speed));
   }
 
