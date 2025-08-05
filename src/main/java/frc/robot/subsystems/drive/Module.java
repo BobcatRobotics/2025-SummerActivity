@@ -23,6 +23,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.console.RIOConsoleSource;
 
 public class Module {
   private final ModuleIO io;
@@ -91,8 +92,8 @@ public class Module {
   /** Runs the module with the specified output while controlling to zero degrees. */
 /** Characterize turn motor feedforward. */
 public void runCharacterization(double output) {
-  io.setDriveOpenLoop(0.0);
-  io.setTurnOpenLoop(output);
+  io.setDriveOpenLoop(output);
+  io.setTurnOpenLoop(0);
 }
 
   /** Disables all outputs to motors. */
