@@ -31,6 +31,7 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.drive.RollerSubsystem;
+import frc.robot.subsystems.drive.ArmSubsystem;
 
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -44,6 +45,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final RollerSubsystem roller;
+  private final ArmSubsystem arm;
 
 
   // Controller
@@ -90,6 +92,7 @@ public class RobotContainer {
 
     }
 roller = new RollerSubsystem();
+arm = new ArmSubsystem();
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -162,6 +165,15 @@ roller = new RollerSubsystem();
     .onFalse(
         Commands.runOnce(() -> roller.stop_motor(), roller)
     );
+
+    controller
+  .rightBumper()
+  .whileTrue(
+      Commands.run(() -> arm.extendArm(), arm)
+  )
+  .onFalse(
+      Commands.runOnce(() -> arm.stopMotor(), arm)
+  );
   }
 
   /**
