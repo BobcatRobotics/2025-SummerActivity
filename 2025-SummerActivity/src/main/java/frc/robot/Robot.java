@@ -50,6 +50,7 @@ public class Robot extends TimedRobot {
     @Override
     public void disabledInit() {}
 
+<<<<<<< Updated upstream
     @Override
     public void disabledPeriodic() {}
 
@@ -69,6 +70,22 @@ public class Robot extends TimedRobot {
         if (autonomousCommand != null) {
             autonomousCommand.schedule();
         }
+=======
+    // Check for valid swerve config
+    var modules =
+        new SwerveModuleConstants[] {
+          TunerConstants.FrontLeft,
+          TunerConstants.FrontRight,
+          TunerConstants.BackLeft,
+          TunerConstants.BackRight
+        };
+    for (var constants : modules) {
+      if (constants.DriveMotorType != DriveMotorArrangement.TalonFX_Integrated
+          || constants.SteerMotorType != SteerMotorArrangement.TalonFX_Integrated) {
+        throw new RuntimeException(
+            "You are using an unsupported swerve configuration, which this template does not support without manual customization. The 2025 release of Phoenix supports some swerve configurations which were not available during 2025 beta testing, preventing any development and support from the AdvantageKit developers.");
+      }
+>>>>>>> Stashed changes
     }
 
     /** This function is called periodically during autonomous. */

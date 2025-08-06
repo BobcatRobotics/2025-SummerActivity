@@ -61,6 +61,7 @@
     </module>
 
     <!--
+<<<<<<< Updated upstream
       Indentation:
       Enforces indentation levels using 4 spaces.
       caseIndent controls indentation inside switch-case.
@@ -73,6 +74,8 @@
     </module>
 
     <!--
+=======
+>>>>>>> Stashed changes
       LeftCurly and RightCurly:
       Enforce brace placement.
       LeftCurly option "eol" means opening braces must be at end of the line, not next line.

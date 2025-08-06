@@ -1,4 +1,5 @@
 {
+<<<<<<< Updated upstream
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.server.launchMode": "Standard",
   "files.exclude": {
@@ -57,4 +58,14 @@
     "edu.wpi.first.math.**.proto.*",
     "edu.wpi.first.math.**.struct.*",
   ]
+=======
+  "java.format.settings.url": ".vscode/eclipse-java-google-style.xml",
+  "java.settings.url": "https://raw.githubusercontent.com/google/styleguide/gh-pages/eclipse-java-google-style.xml",
+  "[java]": {
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": true
+  },
+  "java.configuration.updateBuildConfiguration": "automatic"
+>>>>>>> Stashed changes
 }

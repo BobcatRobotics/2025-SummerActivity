@@ -17,6 +17,7 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
+<<<<<<< Updated upstream
     /**
      * Example of an inner class. One can "import static
      * [...].Constants.OIConstants.*" to gain access
@@ -28,4 +29,28 @@ public final class Constants {
         // Example: the port of the driver's controller
         public static final int DriverControllerPort = 0;
     }
+=======
+  public static final Mode simMode = Mode.SIM;
+  public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+
+  public static enum Mode {
+    /** Running on a real robot. */
+    REAL,
+
+    /** Running a physics simulator. */
+    SIM,
+
+    /** Replaying from a log file. */
+    REPLAY
+  }
+
+  public static final class RollerConstants {
+    public static final int ROLLER_MOTOR_ID = 10;
+    public static final int ROLLER_MOTOR_CURRENT_LIMIT = 60;
+    public static final double ROLLER_MOTOR_VOLTAGE_COMP = 10;
+    public static final double ROLLER_SLOW_SPEED_OUT = 0.1;
+    public static final double ROLLER_FAST_SPEED_OUT = 0.2;
+    public static final double ROLLER_SPEED_IN = -0.1;
+  }
+>>>>>>> Stashed changes
 }
