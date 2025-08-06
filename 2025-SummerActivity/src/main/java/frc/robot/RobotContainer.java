@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.drive.ArmSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -31,8 +32,6 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.drive.RollerSubsystem;
-import frc.robot.subsystems.drive.ArmSubsystem;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -46,7 +45,6 @@ public class RobotContainer {
   private final Drive drive;
   private final RollerSubsystem roller;
   private final ArmSubsystem arm;
-
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -89,10 +87,9 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         break;
-
     }
-roller = new RollerSubsystem();
-arm = new ArmSubsystem();
+    roller = new RollerSubsystem();
+    arm = new ArmSubsystem();
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -156,24 +153,15 @@ arm = new ArmSubsystem();
                     drive)
                 .ignoringDisable(true));
 
+    controller
+        .y()
+        .whileTrue(Commands.run(() -> roller.spin_roller(20), roller))
+        .onFalse(Commands.runOnce(() -> roller.stop_motor(), roller));
 
     controller
-    .y()
-    .whileTrue(
-        Commands.run(() -> roller.spin_roller(0.5), roller))
-
-    .onFalse(
-        Commands.runOnce(() -> roller.stop_motor(), roller)
-    );
-
-    controller
-  .rightBumper()
-  .whileTrue(
-      Commands.run(() -> arm.extendArm(), arm)
-  )
-  .onFalse(
-      Commands.runOnce(() -> arm.stopMotor(), arm)
-  );
+        .rightBumper()
+        .whileTrue(Commands.run(() -> arm.extendArm(), arm))
+        .onFalse(Commands.runOnce(() -> arm.stopMotor(), arm));
   }
 
   /**
