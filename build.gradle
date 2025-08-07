@@ -1,8 +1,8 @@
 plugins {
     id "java"
+    id 'checkstyle'
     id "edu.wpi.first.GradleRIO" version "2025.3.2"
     id "com.peterabeles.gversion" version "1.10"
-    id "com.diffplug.spotless" version "6.12.0"
 }
 
 java {
@@ -97,6 +97,12 @@ dependencies {
     annotationProcessor "org.littletonrobotics.akit:akit-autolog:$akitJson.version"
 }
 
+repositories {
+    maven {
+        url = uri("https://frcmaven.wpi.edu/artifactory/littletonrobotics-mvn-release")
+    }
+}
+
 test {
     useJUnitPlatform()
     systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
@@ -175,44 +181,14 @@ task(eventDeploy) {
 }
 createVersionFile.dependsOn(eventDeploy)
 
-// Spotless formatting
-project.compileJava.dependsOn(spotlessApply)
-spotless {
-    java {
-        target fileTree(".") {
-            include "**/*.java"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        toggleOffOn()
-        googleJavaFormat()
-        removeUnusedImports()
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    groovyGradle {
-        target fileTree(".") {
-            include "**/*.gradle"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        greclipse()
-        indentWithSpaces(4)
-        trimTrailingWhitespace()
-        endWithNewline()
-    }
-    json {
-        target fileTree(".") {
-            include "**/*.json"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        gson().indentWithSpaces(2)
-    }
-    format "misc", {
-        target fileTree(".") {
-            include "**/*.md", "**/.gitignore"
-            exclude "**/build/**", "**/build-*/**"
-        }
-        trimTrailingWhitespace()
-        indentWithSpaces(2)
-        endWithNewline()
+checkstyle {
+    configFile = file("config/checkstyle/checkstyle.xml")
+    toolVersion = '10.26.1' // or current latest
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        html.required = true
+        xml.required = false
     }
 }

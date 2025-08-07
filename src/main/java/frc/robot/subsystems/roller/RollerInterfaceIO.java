@@ -22,7 +22,7 @@ public interface RollerInterfaceIO {
     public double currentAmps = 0.0;
 
     /** Current state of the motor, as defined by {@link MotorState}. */
-    //public RollerState state = RollerState.IDLE;
+    public RollerState state = RollerState.IDLE;
   }
 
   /**

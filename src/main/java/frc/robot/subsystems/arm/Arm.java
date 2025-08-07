@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Arm extends SubsystemBase {
   private ArmInterfaceIO io;
-  //private ArmModuleIOInputsAutoLogged inputs = new ArmModuleIOInputsAutoLogged();
+  private ArmModuleIOInputsAutoLogged inputs = new ArmModuleIOInputsAutoLogged();
   private final Alert motorDisconnectedAlert = new Alert("motor disconnected!", AlertType.kWarning);
   private final String name;
   /** Creates a new roller. */

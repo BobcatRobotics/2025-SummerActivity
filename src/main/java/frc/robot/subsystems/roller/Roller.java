@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Roller extends SubsystemBase {
   private RollerInterfaceIO io;
-  //private RollerModuleIOInputsAutoLogged inputs = new RollerModuleIOInputsAutoLogged();
+  private RollerModuleIOInputsAutoLogged inputs = new RollerModuleIOInputsAutoLogged();
   private final Alert motorDisconnectedAlert = new Alert("motor disconnected!", AlertType.kWarning);
   private final String name;
   /** Creates a new roller. */
