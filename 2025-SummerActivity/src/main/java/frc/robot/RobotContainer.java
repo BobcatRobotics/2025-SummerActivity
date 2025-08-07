@@ -20,23 +20,20 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.ArmIn;
-import frc.robot.commands.ArmOut;
 import frc.robot.commands.DriveCommands;
-import frc.robot.commands.SetRollerSpeed;
-import frc.robot.commands.StopArm;
-import frc.robot.commands.StopRoller;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.Arm;
-import frc.robot.subsystems.Roller;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.roller.Roller;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -48,15 +45,15 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final Roller roller = new Roller();
+  private final Roller roller;
   private final Arm arm = new Arm();
 
-  private final SetRollerSpeed setRollerFullSpeed = new SetRollerSpeed(roller, 1);
-  private final SetRollerSpeed setRollerReverseFullSpeed = new SetRollerSpeed(roller, -1);
-  private final StopRoller stopRoller = new StopRoller(roller);
-  private final ArmIn armIn = new ArmIn(arm);
-  private final ArmOut armOut = new ArmOut(arm);
-  private final StopArm stopArm = new StopArm(arm);
+  private final Command setRollerFullSpeed;
+  private final Command setRollerReverseFullSpeed;
+  private final Command stopRoller;
+  private final Command armIn = new RunCommand(() -> arm.armIn());
+  private final Command armOut = new RunCommand(() -> arm.armOut());
+  private final Command stopArm = new InstantCommand(() -> arm.stopArm());
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -66,6 +63,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    roller = new Roller();
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -88,7 +87,6 @@ public class RobotContainer {
                 new ModuleIOSim(TunerConstants.BackLeft),
                 new ModuleIOSim(TunerConstants.BackRight));
         break;
-
       default:
         // Replayed robot, disable IO implementations
         drive =
@@ -120,6 +118,9 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
+    setRollerFullSpeed = new RunCommand(() -> roller.setSpeed(25), roller);
+    setRollerReverseFullSpeed = new RunCommand(() -> roller.setSpeed(-25), roller);
+    stopRoller = new InstantCommand(() -> roller.stopRoller());
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -167,7 +168,7 @@ public class RobotContainer {
     controller.rightTrigger().whileTrue(setRollerFullSpeed).onFalse(stopRoller);
 
     // Run roller backward when left trigger is pressed
-    controller.leftTrigger().whileTrue(setRollerReverseFullSpeed).onFalse(setRollerFullSpeed);
+    controller.leftTrigger().whileTrue(setRollerReverseFullSpeed).onFalse(stopRoller);
 
     // Run arm forward when right bumper is pressed
     controller.rightBumper().whileTrue(armIn).onFalse(stopArm);
