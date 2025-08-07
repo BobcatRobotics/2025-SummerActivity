@@ -21,19 +21,18 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.RollerSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.roller.RollerSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -53,21 +52,20 @@ public class RobotContainer {
   private final LoggedDashboardChooser<Command> autoChooser;
 
   // Roller Subsystem + Commands
-  public final RollerSubsystem m_roller = new RollerSubsystem();
+  public final RollerSubsystem mRoller = new RollerSubsystem();
   public Command rollerInCommand =
-      new InstantCommand(() -> m_roller.runRoller(Constants.RollerConstants.ROLLER_SPEED_IN));
+      new InstantCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SPEED_IN));
   public Command rollerOutCommand =
-      new InstantCommand(() -> m_roller.runRoller(Constants.RollerConstants.ROLLER_SPEED_OUT));
-  public Command rollerStopCommand = new InstantCommand(() -> m_roller.stopRoller());
+      new InstantCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SPEED_OUT));
+  public Command rollerStopCommand = new InstantCommand(() -> mRoller.stopRoller());
 
   // Arm Subsystem + Commands
-  public final ArmSubsystem m_arm = new ArmSubsystem();
+  public final ArmSubsystem mArm = new ArmSubsystem();
   public Command armUpCommand =
-      new InstantCommand(() -> m_arm.runArm(Constants.ArmConstants.ARM_SPEED_UP));
+      new InstantCommand(() -> mArm.positionArm(Constants.ArmConstants.ARM_ROTATIONS_UP));
   public Command armDownCommand =
-      new InstantCommand(() -> m_arm.runArm(Constants.ArmConstants.ARM_SPEED_DOWN));
-  public Command armStopCommand = new InstantCommand(() -> m_arm.stopArm());
-  public Command armJoystick = new RunCommand(() -> m_arm.runArm(controller.getRightY()));
+      new InstantCommand(() -> mArm.positionArm(Constants.ArmConstants.ARM_ROTATIONS_DOWN));
+  public Command armStopCommand = new InstantCommand(() -> mArm.stopArm());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -142,8 +140,7 @@ public class RobotContainer {
             drive,
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
-            () -> -controller.getRightX()).
-            alongWith(armJoystick));
+            () -> -controller.getRightX()));
 
     // Lock to 0 when A button is held
     controller

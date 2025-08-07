@@ -2,7 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+// import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
@@ -12,8 +12,8 @@ import frc.robot.Constants.ArmConstants;
 public class ArmSubsystem extends SubsystemBase {
 
   private final TalonFX armMotor;
-  private final VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
-  private final PositionVoltage m_positionVoltage = new PositionVoltage(0).withSlot(0);
+  // private final VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
+  private final PositionVoltage mPositionVoltage = new PositionVoltage(0).withSlot(0);
 
   public ArmSubsystem() {
     armMotor = new TalonFX(ArmConstants.ARM_MOTOR_ID);
@@ -32,29 +32,22 @@ public class ArmSubsystem extends SubsystemBase {
     config.Slot0.kI = 0;
     config.Slot0.kD = 0;
 
-
     armMotor.getConfigurator().apply(config);
   }
 
   @Override
   public void periodic() {}
 
-  /**
-   * This is a method that makes the arm move at your desired speed Positive values make it spin
-   * forward and negative values spin it in reverse
-   *
-   * @param speed motor speed from -1.0 to 1, with 0 stopping it
-   */
-  public void runArm(double speed) {
-    armMotor.setControl(m_velocityVoltage.withVelocity(speed));
-  }
+  // public void runArm(double speed) {
+  //   armMotor.setControl(m_velocityVoltage.withVelocity(speed));
+  // }
 
   public void positionArm(double pos) {
     double desiredRotations = pos * ArmConstants.ARM_PID_POSITION;
     if (Math.abs(desiredRotations) <= 0.1) {
       desiredRotations = 0;
     }
-    armMotor.setControl(m_positionVoltage.withPosition(desiredRotations));
+    armMotor.setControl(mPositionVoltage.withPosition(desiredRotations));
   }
 
   public void stopArm() {
