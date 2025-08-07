@@ -2,10 +2,10 @@ package frc.robot.subsystems.roller;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface rollerModuleIO {
+public interface RollerModuleIO {
 
   @AutoLog
-  public static class rollerModuleIOInputs {
+  public static class RollerModuleIOInputs {
     /** Whether the motor is connected and responsive. */
     public boolean connected = false;
 
@@ -31,11 +31,11 @@ public interface rollerModuleIO {
    *
    * @param inputs The container to populate with the current motor telemetry data.
    */
-  public default void updateInputs(rollerModuleIOInputs inputs) {}
+  public default void updateInputs(RollerModuleIOInputs inputs) {}
 
   public default void runRoller(double speedInRadians) {}
   ;
 
-  public default void stopMotor() {}
+  public default void stopRoller() {}
   ;
 }

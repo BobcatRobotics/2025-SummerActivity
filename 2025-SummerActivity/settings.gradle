@@ -20,13 +20,8 @@ pluginManagement {
         }
         def frcHomeMaven = new File(frcHome, 'maven')
         maven {
-<<<<<<< Updated upstream
-            name = 'frcHome'
-            url = frcHomeMaven
-=======
             name 'frcHome'
             url frcHomeMaven
->>>>>>> Stashed changes
         }
     }
 }

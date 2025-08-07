@@ -1,23 +1,35 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
+// Copyright 2021-2025 FRC 6328
+// http://github.com/Mechanical-Advantage
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU General Public License
+// version 3 as published by the Free Software Foundation or
+// available in the root directory of this project.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+// GNU General Public License for more details.
 
 package frc.robot;
 
+import com.pathplanner.lib.auto.AutoBuilder;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-<<<<<<< Updated upstream
-import edu.wpi.first.wpilibj2.command.PrintCommand;
-import edu.wpi.first.wpilibj2.command.SelectCommand;
-import java.util.Map;
-=======
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.arm.ArmModuleIO;
+import frc.robot.subsystems.arm.ArmModuleReal;
+import frc.robot.subsystems.arm.ArmModuleSim;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -25,46 +37,23 @@ import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.roller.RollerSubsystem;
+import frc.robot.subsystems.roller.RollerModuleIO;
+import frc.robot.subsystems.roller.RollerModuleReal;
+import frc.robot.subsystems.roller.RollerModuleSim;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
->>>>>>> Stashed changes
 
 /**
- * This class is where the bulk of the robot should be declared. Since
- * Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in
- * the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of
- * the robot (including
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-<<<<<<< Updated upstream
-    // The enum used as keys for selecting the command to run.
-    private enum CommandSelector {
-      ONE,
-      TWO,
-      THREE
-    }
-
-    /*
-     * An example selector method for the selectcommand. Returns the selector that
-     * will select
-     * which command to run. Can base this choice on logical conditions evaluated at
-     * runtime.
-     */
-    private CommandSelector select() {
-        return CommandSelector.ONE;
-    }
-=======
   // Subsystems
   private final Drive drive;
-  private final RollerSubsystem roller;
-
-  // Commands
-  public Command rollerInCommand;
-  public Command rollerStopCommand;
-  public Command rollerSlowOutCommand;
-  public Command rollerFastOutCommand;
+  private final RollerSubsystem mRoller;
+  private final ArmSubsystem mArm;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -77,6 +66,8 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
+        mRoller = new RollerSubsystem(new RollerModuleReal(Constants.RollerConstants.ROLLER_MOTOR_ID, "rio"), "Roller");
+        mArm = new ArmSubsystem(new ArmModuleReal(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -88,6 +79,8 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
+        mRoller = new RollerSubsystem(new RollerModuleSim(Constants.RollerConstants.ROLLER_MOTOR_ID, "rio"), "Roller");
+        mArm = new ArmSubsystem(new ArmModuleSim(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
         drive =
             new Drive(
                 new GyroIO() {},
@@ -99,6 +92,10 @@ public class RobotContainer {
 
       default:
         // Replayed robot, disable IO implementations
+        mRoller = new RollerSubsystem(new RollerModuleIO() {
+        }, "Roller");
+        mArm = new ArmSubsystem(new ArmModuleIO(){}, "Arm");
+
         drive =
             new Drive(
                 new GyroIO() {},
@@ -109,63 +106,46 @@ public class RobotContainer {
         break;
     }
 
-    // Set up the remaining subsystems
-    roller = new RollerSubsystem();
-    rollerInCommand =
-        new InstantCommand(
-            () -> roller.runRoller(Constants.RollerConstants.ROLLER_SPEED_IN));
-    rollerStopCommand = Commands.runOnce(() -> roller.stopRoller(), roller);
-    rollerSlowOutCommand =
-        new InstantCommand(
-            () -> roller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT));
+
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
->>>>>>> Stashed changes
 
-    /*
-     * An example selectcommand. Will select from the three commands based on the
-     * value returned
-     * by the selector method at runtime. Note that selectcommand works on Object(),
-     * so the
-     * selector does not have to be an enum; it could be any desired type (string,
-     * integer,
-     * boolean, double...)
-     */
-    private final Command exampleSelectCommand = new SelectCommand<>(
-        // Maps selector values to commands
-        Map.ofEntries(
-        Map.entry(CommandSelector.ONE, new PrintCommand("Command one was selected!")),
-        Map.entry(CommandSelector.TWO, new PrintCommand("Command two was selected!")),
-        Map.entry(CommandSelector.THREE, new PrintCommand("Command three was selected!"))),
-        this::select);
+    // Set up SysId routines
+    autoChooser.addOption(
+        "Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
+    autoChooser.addOption(
+        "Drive Simple FF Characterization", DriveCommands.feedforwardCharacterization(drive));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Forward)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Quasistatic Reverse)",
+        drive.sysIdQuasistatic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
+    autoChooser.addOption(
+        "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    public RobotContainer() {
-      // Configure the button bindings
-        configureButtonBindings();
-    }
+    // Configure the button bindings
+    configureButtonBindings();
+  }
 
-    /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by
-     * instantiating a {@link GenericHID} or one of its subclasses ({@link
-     * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling
-     * passing it to a
-     * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-     */
-    private void configureButtonBindings() {
-    }
+  /**
+   * Use this method to define your button->command mappings. Buttons can be created by
+   * instantiating a {@link GenericHID} or one of its subclasses ({@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   */
+  private void configureButtonBindings() {
+    // Default command, normal field-relative drive
+    drive.setDefaultCommand(
+        DriveCommands.joystickDrive(
+            drive,
+            () -> -controller.getLeftY(),
+            () -> -controller.getLeftX(),
+            () -> -controller.getRightX()));
 
-<<<<<<< Updated upstream
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return exampleSelectCommand;
-    }
-=======
     // Lock to 0° when A button is held
     controller
         .a()
@@ -189,8 +169,17 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-
-    controller.y().whileTrue(rollerInCommand).onFalse(rollerStopCommand);
+    
+    // Roller Commands
+    Command runSlowOut = new RunCommand(()->mRoller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT));
+    Command stopMotor = Commands.runOnce(()->mRoller.stopRoller());
+    controller.y().whileTrue(runSlowOut).onFalse(stopMotor);
+    // Arm Commands
+    Command armUpCommand = new RunCommand(()->mArm.runArm(Constants.ArmConstants.ARM_SPEED_UP));
+    Command armDownCommand =new RunCommand(()->mArm.runArm(Constants.ArmConstants.ARM_SPEED_DOWN));
+    Command armStopCommand = Commands.runOnce(()->mArm.stopArm());
+    controller.rightBumper().whileTrue(armUpCommand).onFalse(armStopCommand);
+    controller.leftBumper().whileTrue(armDownCommand).onFalse(armStopCommand);
   }
 
   /**
@@ -201,5 +190,4 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     return autoChooser.get();
   }
->>>>>>> Stashed changes
 }

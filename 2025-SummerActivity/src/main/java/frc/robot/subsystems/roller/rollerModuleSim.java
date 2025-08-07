@@ -1,5 +1,7 @@
 package frc.robot.subsystems.roller;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -18,8 +20,9 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
+import frc.robot.subsystems.roller.RollerModuleIO.RollerModuleIOInputs;
 
-public class rollerModuleSim implements rollerModuleIO {
+public class RollerModuleSim implements RollerModuleIO {
 
   private final TalonFX motor;
   private final StatusSignal<Angle> relativePosition;
@@ -43,11 +46,12 @@ public class rollerModuleSim implements rollerModuleIO {
   private double maxAcceleration = 100.0; // RPS * RPS
   private final double simLoopPeriodSec = 0.02; // 20ms typical loop time
 
-  public rollerModuleSim(int id, String bus) {
+  public RollerModuleSim(int id, String bus) {
 
     this.motor = new TalonFX(id, bus);
 
     config = new TalonFXConfiguration();
+    config.Feedback.SensorToMechanismRatio = 25;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -71,7 +75,7 @@ public class rollerModuleSim implements rollerModuleIO {
   }
 
   @Override
-  public void updateInputs(rollerModuleIOInputs inputs) {
+  public void updateInputs(RollerModuleIOInputs inputs) {
     var motorStatus =
         BaseStatusSignal.refreshAll(
             relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
@@ -108,10 +112,13 @@ public class rollerModuleSim implements rollerModuleIO {
     // Feed simulated values to the motor's sim state
     simState.setRotorVelocity(simulatedVelocity);
     simState.setRawRotorPosition(simulatedPosition);
-    simState.setSupplyVoltage(12.0); // simulate battery voltage
+    simState.setSupplyVoltage(12.0);// simulate battery voltage    
+    Logger.recordOutput("/Roller/velocityRotPerSec", simulatedVelocity);
   }
 
   public void stopRoller() {
+    //runRoller(0);
     motor.stopMotor();
+    runRoller(0);
   }
 }

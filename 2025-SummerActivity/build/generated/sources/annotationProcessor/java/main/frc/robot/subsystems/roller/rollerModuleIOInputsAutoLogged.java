@@ -5,7 +5,7 @@ import java.lang.Override;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
-public class rollerModuleIOInputsAutoLogged extends rollerModuleIO.rollerModuleIOInputs implements LoggableInputs, Cloneable {
+public class RollerModuleIOInputsAutoLogged extends RollerModuleIO.RollerModuleIOInputs implements LoggableInputs, Cloneable {
   @Override
   public void toLog(LogTable table) {
     table.put("Connected", connected);
@@ -26,8 +26,8 @@ public class rollerModuleIOInputsAutoLogged extends rollerModuleIO.rollerModuleI
     state = table.get("State", state);
   }
 
-  public rollerModuleIOInputsAutoLogged clone() {
-    rollerModuleIOInputsAutoLogged copy = new rollerModuleIOInputsAutoLogged();
+  public RollerModuleIOInputsAutoLogged clone() {
+    RollerModuleIOInputsAutoLogged copy = new RollerModuleIOInputsAutoLogged();
     copy.connected = this.connected;
     copy.positionRad = this.positionRad;
     copy.velocityRadPerSec = this.velocityRadPerSec;

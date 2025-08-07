@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.RobotBase;
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
  * numerical or boolean
@@ -17,19 +18,6 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-<<<<<<< Updated upstream
-    /**
-     * Example of an inner class. One can "import static
-     * [...].Constants.OIConstants.*" to gain access
-     * to the constants contained within without having to preface the names with
-     * the class, greatly
-     * reducing the amount of text required.
-     */
-    public static final class OIConstants {
-        // Example: the port of the driver's controller
-        public static final int DriverControllerPort = 0;
-    }
-=======
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
 
@@ -52,5 +40,13 @@ public final class Constants {
     public static final double ROLLER_FAST_SPEED_OUT = 0.2;
     public static final double ROLLER_SPEED_IN = -0.1;
   }
->>>>>>> Stashed changes
+  public static final class ArmConstants {
+    public static final int ARM_MOTOR_ID = 9;
+    public static final int ARM_MOTOR_CURRENT_LIMIT = 10;
+    public static final double ARM_MOTOR_VOLTAGE_COMP = 10;
+    public static final double ARM_SPEED_DOWN = 0.177;
+    public static final double ARM_SPEED_UP = -0.19;
+    public static final int ARM_SWITCH_PORT = 0;
+    public static final double ARM_MOTOR_STATOR_CURRENT_LIMIT = 10;
+  }
 }

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.roller;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -18,8 +20,9 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
+import frc.robot.subsystems.roller.RollerModuleIO.RollerModuleIOInputs;
 
-public class rollerModuleReal implements rollerModuleIO {
+public class RollerModuleReal implements RollerModuleIO {
 
   private final TalonFX motor;
   private final StatusSignal<Angle> relativePosition;
@@ -34,10 +37,11 @@ public class rollerModuleReal implements rollerModuleIO {
   private final PositionVoltage positionControl = new PositionVoltage(0);
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
 
-  public rollerModuleReal(int id, String bus) {
+  public RollerModuleReal(int id, String bus) {
     this.motor = new TalonFX(id, bus);
 
     config = new TalonFXConfiguration();
+    config.Feedback.SensorToMechanismRatio = 25;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -59,7 +63,7 @@ public class rollerModuleReal implements rollerModuleIO {
   }
 
   @Override
-  public void updateInputs(rollerModuleIOInputs inputs) {
+  public void updateInputs(RollerModuleIOInputs inputs) {
     var motorStatus =
         BaseStatusSignal.refreshAll(
             relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
@@ -84,9 +88,12 @@ public class rollerModuleReal implements rollerModuleIO {
   public void runRoller(double speed) {
     double velocityRotPerSec = Units.radiansToRotations(speed);
     motor.setControl(velocityControl.withVelocity(velocityRotPerSec));
+    Logger.recordOutput("/Roller/velocityRotPerSec", velocityRotPerSec);
   }
 
   public void stopRoller() {
     motor.stopMotor();
+    
+    Logger.recordOutput("/Roller/velocityRotPerSec", 0);
   }
 }
