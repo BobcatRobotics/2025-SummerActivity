@@ -6,6 +6,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.Constants.RollerConstants;
+import org.littletonrobotics.junction.Logger;
 
 public class RollerIOTalonFX implements RollerIO {
   private final TalonFX rollerMotor;
@@ -19,6 +20,7 @@ public class RollerIOTalonFX implements RollerIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = RollerConstants.ROLLER_MOTOR_CURRENT_LIMIT;
+    config.Feedback.SensorToMechanismRatio = 4;
 
     // Velocity PIDs
     config.Slot0.kP = 0.11; // TODO tune this
@@ -34,6 +36,10 @@ public class RollerIOTalonFX implements RollerIO {
     inputs.rollerVelocity = rollerMotor.getVelocity().getValueAsDouble();
     inputs.rollerAppliedVolts = rollerMotor.getMotorVoltage().getValueAsDouble();
     inputs.rollerCurrentAmps = rollerMotor.getSupplyCurrent().getValueAsDouble();
+
+    Logger.recordOutput("/Roller/velocityRotPerSec", rollerMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("/Roller/TargetVelocityIn", RollerConstants.ROLLER_SPEED_IN);
+    Logger.recordOutput("/Roller/TargetVelocityOut", RollerConstants.ROLLER_SPEED_OUT);
   }
 
   public void runRoller(double speed) {

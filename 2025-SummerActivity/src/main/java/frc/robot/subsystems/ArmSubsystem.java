@@ -26,6 +26,7 @@ public class ArmSubsystem extends SubsystemBase {
     config.CurrentLimits.StatorCurrentLimitEnable = true;
     config.CurrentLimits.StatorCurrentLimit = ArmConstants.ARM_MOTOR_STATOR_CURRENT_LIMIT;
     config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.25; // TODO tune this
+    config.Feedback.SensorToMechanismRatio = 75;
 
     // Velocity PIDs
     config.Slot0.kP = 0.11; // TODO tune this

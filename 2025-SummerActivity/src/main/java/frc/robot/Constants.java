@@ -39,8 +39,8 @@ public final class Constants {
     public static final int ROLLER_MOTOR_ID = 10;
     public static final int ROLLER_MOTOR_CURRENT_LIMIT = 20;
     public static final double ROLLER_MOTOR_VOLTAGE_COMP = 10;
-    public static final double ROLLER_SPEED_OUT = 8;
-    public static final double ROLLER_SPEED_IN = -8;
+    public static final double ROLLER_SPEED_OUT = 20;
+    public static final double ROLLER_SPEED_IN = -20;
   }
 
   public static final class ArmConstants {

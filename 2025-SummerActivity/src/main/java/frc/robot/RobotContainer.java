@@ -168,8 +168,8 @@ public class RobotContainer {
 
     controller.leftBumper().whileTrue(rollerInCommand).onFalse(rollerStopCommand);
     controller.rightBumper().whileTrue(rollerOutCommand).onFalse(rollerStopCommand);
-    controller.leftTrigger().whileTrue(armDownCommand).onFalse(armStopCommand);
-    controller.rightTrigger().whileTrue(armUpCommand).onFalse(armStopCommand);
+    controller.leftTrigger().whileTrue(armUpCommand).onFalse(armStopCommand);
+    controller.rightTrigger().whileTrue(armDownCommand).onFalse(armStopCommand);
   }
 
   /**

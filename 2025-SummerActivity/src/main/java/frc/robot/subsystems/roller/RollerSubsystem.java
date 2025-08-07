@@ -15,7 +15,9 @@ public class RollerSubsystem extends SubsystemBase {
   }
 
   @Override
-  public void periodic() {}
+  public void periodic() {
+    io.updateInputs(inputs);
+  }
 
   public void runRoller(double speed) {
     io.runRoller(speed);
