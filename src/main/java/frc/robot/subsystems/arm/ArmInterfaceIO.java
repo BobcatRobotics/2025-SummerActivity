@@ -22,7 +22,7 @@ public interface ArmInterfaceIO {
     public double currentAmps = 0.0;
 
     /** Current state of the motor, as defined by {@link MotorState}. */
-    //public ArmState state = ArmState.IDLE;
+    public ArmState state = ArmState.IDLE;
   }
 
   /**
