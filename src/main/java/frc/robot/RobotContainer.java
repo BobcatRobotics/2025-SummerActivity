@@ -20,10 +20,13 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.RollerSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -41,6 +44,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final RollerSubsystem roller;
+  private final ArmSubsystem arm;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -84,8 +89,9 @@ public class RobotContainer {
                 new ModuleIO() {});
         break;
     }
-
-    // Set up auto routines
+      roller = new RollerSubsystem();
+      arm = new ArmSubsystem();
+      // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
     // Set up SysId routines
@@ -132,6 +138,18 @@ public class RobotContainer {
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> new Rotation2d()));
+    controller
+        .y()
+        .whileTrue(Commands.run(() -> roller.spinroller(0), roller))
+        .onFalse(Commands.run(() -> roller.stopmotor(), roller));
+    controller
+        .leftBumper()
+        .whileTrue(new RunCommand(() -> arm.extend()))
+        .onFalse(new RunCommand(() -> arm.stopMotor()));
+    controller
+        .rightBumper()
+        .whileTrue(new RunCommand(() -> arm.stow()))
+        .onFalse(new RunCommand(() -> arm.stopMotor()));
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));

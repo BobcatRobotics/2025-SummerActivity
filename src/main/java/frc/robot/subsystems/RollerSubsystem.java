@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix6.configs.Slot0Configs;
 //import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 //import com.ctre.phoenix6.controls.DutyCycleOut;
@@ -12,15 +13,12 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 public class RollerSubsystem extends SubsystemBase {
   /** Creates a new ArmSubsystem. */
-  private final TalonFX m_MainMotor = new TalonFX(0, "rio"); //Added a single TalonFX motor
-  private final VelocityDutyCycle m_MotorRequest = new VelocityDutyCycle(0);
+  private final TalonFX mainMotor = new TalonFX(25, "rio"); //Added a single TalonFX motor
+  private final VelocityDutyCycle motorRequest = new VelocityDutyCycle(0);
   //private final DutyCycleOut m_MotorRequest = new DutyCycleOut(0);
   //Used for Duty Cycle
-  
-
   public RollerSubsystem() {
     //Config setting 1: Make new configuration for motor
     TalonFXConfiguration config = new TalonFXConfiguration();
@@ -32,18 +30,19 @@ public class RollerSubsystem extends SubsystemBase {
     config.CurrentLimits.StatorCurrentLimit =  20;
     config.CurrentLimits.StatorCurrentLimitEnable =  true;
 
-    m_MainMotor.getConfigurator().apply(config); //Applies motor configurations
+    var Slot0Configs = new Slot0Configs();
+    Slot0Configs.kP = 0.4;
+    config.Slot0 = Slot0Configs;
+
+    mainMotor.getConfigurator().apply(config); //Applies motor configurations
   }
-
-  public void spin_roller(double output) {
-    m_MotorRequest.withVelocity(output);
-    m_MainMotor.setControl(m_MotorRequest);
+  public void spinroller(double output) {
+    motorRequest.withVelocity(output);
+    mainMotor.setControl(motorRequest);
 }
-public void stop_motor() {
-  m_MainMotor.stopMotor();
+public void stopmotor() {
+  mainMotor.stopMotor();
 }
-  
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
