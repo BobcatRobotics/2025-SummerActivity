@@ -9,7 +9,6 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.controls.VelocityDutyCycle;
 
@@ -40,6 +39,12 @@ public class RollerSubsystem extends SubsystemBase {
     roller.getConfigurator().apply(motor_config);
 
   }
+    public void start() {
+      spin_roller(60);
+  }
+  public void startWithY() {
+     start();
+    }
 
   @Override
 
@@ -59,3 +64,4 @@ public class RollerSubsystem extends SubsystemBase {
   }
 
 }
+
