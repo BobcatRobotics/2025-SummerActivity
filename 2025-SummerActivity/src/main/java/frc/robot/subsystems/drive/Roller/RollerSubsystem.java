@@ -1,0 +1,33 @@
+package frc.robot.subsystems.drive.Roller;
+import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+public class RollerSubsystem extends SubsystemBase {
+  private RollerModuleIO io;
+  private RollerModuleIOInputsAutoLogged inputs = new RollerModuleIOInputsAutoLogged();
+  private final Alert motorDisconnectedAlert = new Alert("motor disconnected!", AlertType.kWarning);
+  private final String name;
+  /** Creates a new roller. */
+  public RollerSubsystem(RollerModuleIO io, String name) {
+    this.io = io;
+    this.name = name;
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    io.updateInputs(inputs);
+    Logger.processInputs(name, inputs);
+    motorDisconnectedAlert.set(!inputs.connected);
+  }
+
+  public void runRoller(double speedInRadians) {
+    io.runRoller(speedInRadians);
+  }
+
+  public void stopRoller() {
+    io.stopRoller();
+  }
+}
