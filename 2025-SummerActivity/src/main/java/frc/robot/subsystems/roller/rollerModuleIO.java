@@ -38,4 +38,8 @@ public interface RollerModuleIO {
 
   public default void stopRoller() {}
   ;
+
+  public default void periodic(){
+    
+  }
 }

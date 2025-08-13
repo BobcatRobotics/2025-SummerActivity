@@ -24,9 +24,11 @@ public class RollerSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    io.periodic();
     io.updateInputs(inputs);
     Logger.processInputs(name, inputs);
     motorDisconnectedAlert.set(!inputs.connected);
+
   }
 
   public void runRoller(double speedInRadians) {

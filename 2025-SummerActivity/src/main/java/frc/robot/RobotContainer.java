@@ -205,8 +205,7 @@ public class RobotContainer {
   public void configureKeyboardBindings() {
     Command runSlowOut = new RunCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT));
     Command stopMotor = Commands.runOnce(() -> mRoller.stopRoller());
-    JoystickButton yButton = new JoystickButton(new Joystick(0), 1);
-    yButton.whileTrue(runSlowOut).onFalse(stopMotor);
+    controller.y().whileTrue(runSlowOut).onFalse(stopMotor);
   }
 
   /**

@@ -1,5 +1,7 @@
 package frc.robot.subsystems.roller;
 
+import javax.sound.sampled.Line;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -13,14 +15,25 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.system.LinearSystem;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import frc.robot.Constants;
-import frc.robot.subsystems.roller.RollerModuleIO.RollerModuleIOInputs;
+import frc.robot.Robot;
+import frc.robot.util.TunableDouble;
 
 public class RollerModuleSim implements RollerModuleIO {
 
@@ -37,11 +50,27 @@ public class RollerModuleSim implements RollerModuleIO {
   private PositionVoltage positionControl = new PositionVoltage(0);
   private VelocityVoltage velocityControl = new VelocityVoltage(0);
 
-  // Simulation
-  private final TalonFXSimState simState;
+  // Use onboard Talon PID in real; use software PID in sim for clarity
+  private final PIDController simPid = new PIDController(0.0, 0.0, 0.00);
+  // Flywheel/roller model
+  private static final DCMotor MOTOR = DCMotor.getKrakenX60(1);
+  private static final double GEAR_RATIO = 25.0; // adjust if using reduction
+  private static final double MOI = 0.0009; // kg·m² — estimate, refine later
+  // Simulate a flywheel made from 4 Colson Wheels being directly driven by a Neo
+  // motor
+  private final FlywheelSim m_flywheelSim = new FlywheelSim(
+      LinearSystemId.createFlywheelSystem(
+          MOTOR, MOI, GEAR_RATIO),
+      MOTOR);
+  private final TunableDouble kP = new TunableDouble("/Roller/Config/kP", 0.1);
+  private final TunableDouble kI = new TunableDouble("/Roller/Config/kI", 0.0);
+  private final TunableDouble kD = new TunableDouble("/Roller/Config/kD", 0.0);
+  private final TunableDouble kV = new TunableDouble("/Roller/Config/kV", 0.0);
+  private TalonFXSimState motorSim;
 
   private double simulatedPosition = 0.0;
   private double simulatedVelocity = 0.0;
+  private double goalVelocity = 0.0;
   private double maxSimVelocity = 10.0; // rotations/sec
   private double maxAcceleration = 100.0; // RPS * RPS
   private final double simLoopPeriodSec = 0.02; // 20ms typical loop time
@@ -56,7 +85,10 @@ public class RollerModuleSim implements RollerModuleIO {
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = Constants.RollerConstants.ROLLER_MOTOR_CURRENT_LIMIT;
-
+    config.Slot0.kP = kP.get();
+    config.Slot0.kI = kP.get();
+    config.Slot0.kD = kP.get();
+    config.Slot0.kV = kP.get();
     // Apply initial configuration with retry logic
     motor.getConfigurator().apply(config, 0.25);
 
@@ -71,18 +103,32 @@ public class RollerModuleSim implements RollerModuleIO {
         50.0, relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
     ParentDevice.optimizeBusUtilizationForAll(motor);
 
-    simState = motor.getSimState();
+  }
+
+  public void updateTunnables() {
+    if (kP.check()) {
+      config.Slot0.kP = kP.get();
+    }
+    if (kI.check()) {
+      config.Slot0.kI = kI.get();
+    }
+    if (kP.check()) {
+      config.Slot0.kD = kD.get();
+    }
+    if (kP.check()) {
+      config.Slot0.kV = kV.get();
+    }
+    motor.getConfigurator().apply(config, 0.25);
   }
 
   @Override
   public void updateInputs(RollerModuleIOInputs inputs) {
-    var motorStatus =
-        BaseStatusSignal.refreshAll(
-            relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
-
+    var motorStatus = BaseStatusSignal.refreshAll(
+        relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
+    motorSim = motor.getSimState();
     inputs.connected = connectedDebounce.calculate(motorStatus.isOK());
-    inputs.positionRad = Units.rotationsToRadians(relativePosition.getValueAsDouble());
-    inputs.velocityRadPerSec = Units.rotationsToRadians(motorVelocity.getValueAsDouble());
+    inputs.positionRad = relativePosition.getValueAsDouble();
+    inputs.velocityRadPerSec = motorVelocity.getValueAsDouble();
     inputs.appliedVolts = motorAppliedVolts.getValueAsDouble();
     inputs.currentAmps = motorCurrent.getValueAsDouble();
 
@@ -96,30 +142,45 @@ public class RollerModuleSim implements RollerModuleIO {
       inputs.state = RollerState.UNKNOWN;
     }
 
+    // AdvantageKit logging
+    Logger.recordOutput("/Roller/GoalRotPerSec", goalVelocity);
+    Logger.recordOutput("/Roller/MeasuredRotPerSec", relativePosition.getValueAsDouble());
+    Logger.recordOutput("/Roller/ErrorRotPerSec", goalVelocity - relativePosition.getValueAsDouble());
+  }
 
-    Logger.recordOutput("/Roller/velocityRotPerSec", simulatedVelocity);
+  public void periodic(){
+    updateTunnables();
+    motorSim = motor.getSimState();
+    // Use a software PID + feedforward to produce a voltage request in sim (mirrors
+    // real firmware behavior)
+    double measured = motor.getVelocity().getValueAsDouble();
+    double ffVolts = 12.0 * (0.12 * goalVelocity); // simple kV-style FF example
+    double pidVolts = simPid.calculate(measured, goalVelocity);
+    double volts = Math.max(-12.0, Math.min(12.0, ffVolts + pidVolts));
+    m_flywheelSim.setInputVoltage(volts);
+    m_flywheelSim.update(simLoopPeriodSec);
+
+    // Push sim signals back into Phoenix 6 sim side so telemetry & getVelocity() look real
+    double shaftRPS = m_flywheelSim.getAngularVelocityRPM() / 60.0;
+    simulatedVelocity = shaftRPS * GEAR_RATIO;
+    simulatedPosition += simulatedVelocity * simLoopPeriodSec;
+    motorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
+    motorSim.setRotorVelocity(simulatedVelocity); 
+    motorSim.setRawRotorPosition(simulatedPosition);
+    // Log sim internals to AdvantageKit (super helpful for tuning)
+    Logger.recordOutput("/Roller/VoltageCmd", volts);
+    Logger.recordOutput("/Roller/FFVolts", ffVolts);
+    Logger.recordOutput("/Roller/PIDVolts", pidVolts);
+    Logger.recordOutput("/RollerSim/ShaftRPS", shaftRPS);
   }
 
   public void runRoller(double speed) {
-    double velocityRotPerSec = Units.radiansToRotations(speed);
-    // Simulate gradual acceleration to the target velocity
-    double velocityError = velocityRotPerSec - simulatedVelocity;
-    double accel =
-        Math.signum(velocityError)
-            * Math.min(Math.abs(velocityError), maxAcceleration * simLoopPeriodSec);
-    simulatedVelocity += accel;
-
-    // Update position based on simulated velocity
-    simulatedPosition += simulatedVelocity * simLoopPeriodSec;
-
-    // Feed simulated values to the motor's sim state
-    simState.setRotorVelocity(simulatedVelocity);
-    simState.setRawRotorPosition(simulatedPosition);
-    simState.setSupplyVoltage(12.0);
+    goalVelocity = Units.radiansToRotations(speed);
+    motor.setControl(velocityControl.withVelocity(goalVelocity));
   }
 
   public void stopRoller() {
-    //runRoller(0);
+    // runRoller(0);
     motor.stopMotor();
     runRoller(0);
   }

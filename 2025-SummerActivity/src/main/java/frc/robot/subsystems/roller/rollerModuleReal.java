@@ -20,6 +20,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.subsystems.roller.RollerModuleIO.RollerModuleIOInputs;
 
 public class RollerModuleReal implements RollerModuleIO {
@@ -94,5 +95,8 @@ public class RollerModuleReal implements RollerModuleIO {
   public void stopRoller() {
     motor.stopMotor();    
     Logger.recordOutput("/Roller/velocityRotPerSec", 0);
+  }
+
+  public void periodic(){
   }
 }
