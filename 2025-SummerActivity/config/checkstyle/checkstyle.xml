@@ -60,6 +60,7 @@
       <property name="allowedAnnotations" value="Override"/>
     </module>
 
+
     <!--
       LeftCurly and RightCurly:
       Enforce brace placement.
@@ -80,9 +81,7 @@
       MethodName:
       Enforces method names follow camelCase convention.
     -->
-    <module name="MethodName"/>      
-      <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
-    </module>
+    <module name="MethodName"/>
 
     <!--
       LocalVariableName:

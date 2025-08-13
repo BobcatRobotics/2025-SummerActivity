@@ -95,6 +95,9 @@ public class RollerModuleSim implements RollerModuleIO {
     } else {
       inputs.state = RollerState.UNKNOWN;
     }
+
+
+    Logger.recordOutput("/Roller/velocityRotPerSec", simulatedVelocity);
   }
 
   public void runRoller(double speed) {
@@ -112,8 +115,7 @@ public class RollerModuleSim implements RollerModuleIO {
     // Feed simulated values to the motor's sim state
     simState.setRotorVelocity(simulatedVelocity);
     simState.setRawRotorPosition(simulatedPosition);
-    simState.setSupplyVoltage(12.0);// simulate battery voltage    
-    Logger.recordOutput("/Roller/velocityRotPerSec", simulatedVelocity);
+    simState.setSupplyVoltage(12.0);
   }
 
   public void stopRoller() {

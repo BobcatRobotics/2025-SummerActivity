@@ -108,8 +108,6 @@ public class ArmModuleSim implements ArmModuleIO {
     simState.setRawRotorPosition(simulatedPosition);
     simState.setRotorVelocity(delta / simLoopPeriodSec);
     simState.setSupplyVoltage(12.0); // simulate battery voltage
-
-    
     Logger.recordOutput("/Arm/positionInRotations", simulatedPosition);
   }
 
@@ -124,9 +122,7 @@ public class ArmModuleSim implements ArmModuleIO {
 
     simState.setRawRotorPosition(simulatedPosition);
     simState.setRotorVelocity(delta / simLoopPeriodSec);
-    simState.setSupplyVoltage(12.0); // simulate battery voltage
-
-    
+    simState.setSupplyVoltage(12.0);
     Logger.recordOutput("/Arm/velocityRotPerSec", simulatedPosition);
   }
 }

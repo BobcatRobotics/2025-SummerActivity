@@ -13,16 +13,26 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+import java.awt.event.KeyEvent; // For key constants (simulation only)
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
@@ -44,9 +54,12 @@ import frc.robot.subsystems.roller.RollerModuleSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
- * This class is where the bulk of the robot should be declared. Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a
+ * "declarative" paradigm, very little robot logic should actually be handled in
+ * the {@link Robot}
+ * periodic methods (other than the scheduler calls). Instead, the structure of
+ * the robot (including
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
@@ -61,52 +74,61 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
   public RobotContainer() {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         mRoller = new RollerSubsystem(new RollerModuleReal(Constants.RollerConstants.ROLLER_MOTOR_ID, "rio"), "Roller");
         mArm = new ArmSubsystem(new ArmModuleReal(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
-        drive =
-            new Drive(
-                new GyroIOPigeon2(),
-                new ModuleIOTalonFX(TunerConstants.FrontLeft),
-                new ModuleIOTalonFX(TunerConstants.FrontRight),
-                new ModuleIOTalonFX(TunerConstants.BackLeft),
-                new ModuleIOTalonFX(TunerConstants.BackRight));
+        drive = new Drive(
+            new GyroIOPigeon2(),
+            new ModuleIOTalonFX(TunerConstants.FrontLeft),
+            new ModuleIOTalonFX(TunerConstants.FrontRight),
+            new ModuleIOTalonFX(TunerConstants.BackLeft),
+            new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        // Configure the button bindings
+        configureButtonBindings();
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         mRoller = new RollerSubsystem(new RollerModuleSim(Constants.RollerConstants.ROLLER_MOTOR_ID, "rio"), "Roller");
         mArm = new ArmSubsystem(new ArmModuleSim(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIOSim(TunerConstants.FrontLeft),
-                new ModuleIOSim(TunerConstants.FrontRight),
-                new ModuleIOSim(TunerConstants.BackLeft),
-                new ModuleIOSim(TunerConstants.BackRight));
+        drive = new Drive(
+            new GyroIO() {
+            },
+            new ModuleIOSim(TunerConstants.FrontLeft),
+            new ModuleIOSim(TunerConstants.FrontRight),
+            new ModuleIOSim(TunerConstants.BackLeft),
+            new ModuleIOSim(TunerConstants.BackRight));
+        // Configure the button bindings
+        configureKeyboardBindings();
         break;
 
       default:
         // Replayed robot, disable IO implementations
         mRoller = new RollerSubsystem(new RollerModuleIO() {
         }, "Roller");
-        mArm = new ArmSubsystem(new ArmModuleIO(){}, "Arm");
+        mArm = new ArmSubsystem(new ArmModuleIO() {
+        }, "Arm");
 
-        drive =
-            new Drive(
-                new GyroIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {},
-                new ModuleIO() {});
+        drive = new Drive(
+            new GyroIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            },
+            new ModuleIO() {
+            });
         break;
     }
-
-
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -127,14 +149,14 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    // Configure the button bindings
-    configureButtonBindings();
   }
 
   /**
-   * Use this method to define your button->command mappings. Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing
+   * it to a {@link
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
@@ -164,22 +186,27 @@ public class RobotContainer {
         .b()
         .onTrue(
             Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
+                () -> drive.setPose(
+                    new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+                drive)
                 .ignoringDisable(true));
-    
     // Roller Commands
-    Command runSlowOut = new RunCommand(()->mRoller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT));
-    Command stopMotor = Commands.runOnce(()->mRoller.stopRoller());
+    Command runSlowOut = new RunCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT));
+    Command stopMotor = Commands.runOnce(() -> mRoller.stopRoller());
     controller.y().whileTrue(runSlowOut).onFalse(stopMotor);
     // Arm Commands
-    Command armUpCommand = new RunCommand(()->mArm.runArm(Constants.ArmConstants.ARM_SPEED_UP));
-    Command armDownCommand =new RunCommand(()->mArm.runArm(Constants.ArmConstants.ARM_SPEED_DOWN));
-    Command armStopCommand = Commands.runOnce(()->mArm.stopArm());
+    Command armUpCommand = new RunCommand(() -> mArm.runArm(Constants.ArmConstants.ARM_SPEED_UP));
+    Command armDownCommand = new RunCommand(() -> mArm.runArm(Constants.ArmConstants.ARM_SPEED_DOWN));
+    Command armStopCommand = Commands.runOnce(() -> mArm.stopArm());
     controller.rightBumper().whileTrue(armUpCommand).onFalse(armStopCommand);
     controller.leftBumper().whileTrue(armDownCommand).onFalse(armStopCommand);
+  }
+
+  public void configureKeyboardBindings() {
+    Command runSlowOut = new RunCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT));
+    Command stopMotor = Commands.runOnce(() -> mRoller.stopRoller());
+    JoystickButton yButton = new JoystickButton(new Joystick(0), 1);
+    yButton.whileTrue(runSlowOut).onFalse(stopMotor);
   }
 
   /**
