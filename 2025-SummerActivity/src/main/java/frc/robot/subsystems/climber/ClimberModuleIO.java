@@ -1,11 +1,10 @@
-package frc.robot.subsystems.roller;
+package frc.robot.subsystems.climber;
 
 import org.littletonrobotics.junction.AutoLog;
 
-public interface RollerModuleIO {
-
+public interface ClimberModuleIO {
   @AutoLog
-  public static class RollerModuleIOInputs {
+  public static class ClimberModuleIOInputs {
     /** Whether the motor is connected and responsive. */
     public boolean connected = false;
 
@@ -22,7 +21,7 @@ public interface RollerModuleIO {
     public double currentAmps = 0.0;
 
     /** Current state of the motor, as defined by {@link MotorState}. */
-    public RollerState state = RollerState.IDLE;
+    public ClimberState state = ClimberState.IDLE;
   }
 
   /**
@@ -33,13 +32,13 @@ public interface RollerModuleIO {
    * @param inputs The container to populate with the current motor telemetry
    *               data.
    */
-  public default void updateInputs(RollerModuleIOInputs inputs) {
+  public default void updateInputs(ClimberModuleIOInputs inputs) {
   }
 
-  public default void runRoller(double speedInRadians) {
+  public default void runClimber(double positionInRotations) {
   }
 
-  public default void stopRoller() {
+  public default void stopClimber() {
   }
 
   public default void periodic() {

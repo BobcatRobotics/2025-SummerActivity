@@ -58,7 +58,7 @@ public class RollerModuleSim implements RollerModuleIO {
   private static final double MOI = 0.0009; // kg·m² — estimate, refine later
   // Simulate a flywheel made from 4 Colson Wheels being directly driven by a Neo
   // motor
-  private final FlywheelSim m_flywheelSim = new FlywheelSim(
+  private final FlywheelSim flywheelSim = new FlywheelSim(
       LinearSystemId.createFlywheelSystem(
           MOTOR, MOI, GEAR_RATIO),
       MOTOR);
@@ -80,7 +80,7 @@ public class RollerModuleSim implements RollerModuleIO {
     this.motor = new TalonFX(id, bus);
 
     config = new TalonFXConfiguration();
-    config.Feedback.SensorToMechanismRatio = 25;
+    config.Feedback.SensorToMechanismRatio = GEAR_RATIO;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -144,11 +144,11 @@ public class RollerModuleSim implements RollerModuleIO {
 
     // AdvantageKit logging
     Logger.recordOutput("/Roller/GoalRotPerSec", goalVelocity);
-    Logger.recordOutput("/Roller/MeasuredRotPerSec", relativePosition.getValueAsDouble());
-    Logger.recordOutput("/Roller/ErrorRotPerSec", goalVelocity - relativePosition.getValueAsDouble());
+    Logger.recordOutput("/Roller/MeasuredRotPerSec", motorVelocity.getValueAsDouble());
+    Logger.recordOutput("/Roller/ErrorRotPerSec", goalVelocity - motorVelocity.getValueAsDouble());
   }
 
-  public void periodic(){
+  public void periodic() {
     updateTunnables();
     motorSim = motor.getSimState();
     // Use a software PID + feedforward to produce a voltage request in sim (mirrors
@@ -157,15 +157,16 @@ public class RollerModuleSim implements RollerModuleIO {
     double ffVolts = 12.0 * (0.12 * goalVelocity); // simple kV-style FF example
     double pidVolts = simPid.calculate(measured, goalVelocity);
     double volts = Math.max(-12.0, Math.min(12.0, ffVolts + pidVolts));
-    m_flywheelSim.setInputVoltage(volts);
-    m_flywheelSim.update(simLoopPeriodSec);
+    flywheelSim.setInputVoltage(volts);
+    flywheelSim.update(simLoopPeriodSec);
 
-    // Push sim signals back into Phoenix 6 sim side so telemetry & getVelocity() look real
-    double shaftRPS = m_flywheelSim.getAngularVelocityRPM() / 60.0;
+    // Push sim signals back into Phoenix 6 sim side so telemetry & getVelocity()
+    // look real
+    double shaftRPS = flywheelSim.getAngularVelocityRPM() / 60.0;
     simulatedVelocity = shaftRPS * GEAR_RATIO;
     simulatedPosition += simulatedVelocity * simLoopPeriodSec;
     motorSim.setSupplyVoltage(RobotController.getBatteryVoltage());
-    motorSim.setRotorVelocity(simulatedVelocity); 
+    motorSim.setRotorVelocity(simulatedVelocity);
     motorSim.setRawRotorPosition(simulatedPosition);
     // Log sim internals to AdvantageKit (super helpful for tuning)
     Logger.recordOutput("/Roller/VoltageCmd", volts);

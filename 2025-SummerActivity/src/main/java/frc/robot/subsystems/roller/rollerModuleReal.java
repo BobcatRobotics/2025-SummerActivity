@@ -93,7 +93,7 @@ public class RollerModuleReal implements RollerModuleIO {
   }
 
   public void stopRoller() {
-    motor.stopMotor();    
+    motor.stopMotor();
     Logger.recordOutput("/Roller/velocityRotPerSec", 0);
   }
 

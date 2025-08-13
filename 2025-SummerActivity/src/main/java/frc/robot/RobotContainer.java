@@ -37,6 +37,10 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.climber.ClimberModuleSim;
+import frc.robot.subsystems.climber.ClimberModuleIO;
+import frc.robot.subsystems.climber.ClimberModuleReal;
+import frc.robot.subsystems.climber.ClimberSubsystem;
 import frc.robot.subsystems.arm.ArmModuleIO;
 import frc.robot.subsystems.arm.ArmModuleReal;
 import frc.robot.subsystems.arm.ArmModuleSim;
@@ -67,6 +71,7 @@ public class RobotContainer {
   private final Drive drive;
   private final RollerSubsystem mRoller;
   private final ArmSubsystem mArm;
+  private final ClimberSubsystem mClimber;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -83,6 +88,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         mRoller = new RollerSubsystem(new RollerModuleReal(Constants.RollerConstants.ROLLER_MOTOR_ID, "rio"), "Roller");
         mArm = new ArmSubsystem(new ArmModuleReal(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
+        mClimber = new ClimberSubsystem(new ClimberModuleReal(Constants.ClimberConstants.CLIMBER_MOTOR_ID, "rio"),"Climber");
         drive = new Drive(
             new GyroIOPigeon2(),
             new ModuleIOTalonFX(TunerConstants.FrontLeft),
@@ -98,6 +104,7 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
         mRoller = new RollerSubsystem(new RollerModuleSim(Constants.RollerConstants.ROLLER_MOTOR_ID, "rio"), "Roller");
         mArm = new ArmSubsystem(new ArmModuleSim(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
+        mClimber = new ClimberSubsystem(new ClimberModuleSim(Constants.ClimberConstants.CLIMBER_MOTOR_ID, "rio"),"Climber");
         drive = new Drive(
             new GyroIO() {
             },
@@ -115,7 +122,8 @@ public class RobotContainer {
         }, "Roller");
         mArm = new ArmSubsystem(new ArmModuleIO() {
         }, "Arm");
-
+        mClimber = new ClimberSubsystem(new ClimberModuleIO() {
+        }, "Climber");
         drive = new Drive(
             new GyroIO() {
             },
@@ -191,7 +199,7 @@ public class RobotContainer {
                 drive)
                 .ignoringDisable(true));
     // Roller Commands
-    Command runSlowOut = new RunCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT));
+    Command runSlowOut = new RunCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT_IN_RADPERSEC));
     Command stopMotor = Commands.runOnce(() -> mRoller.stopRoller());
     controller.y().whileTrue(runSlowOut).onFalse(stopMotor);
     // Arm Commands
@@ -200,12 +208,24 @@ public class RobotContainer {
     Command armStopCommand = Commands.runOnce(() -> mArm.stopArm());
     controller.rightBumper().whileTrue(armUpCommand).onFalse(armStopCommand);
     controller.leftBumper().whileTrue(armDownCommand).onFalse(armStopCommand);
+
+    Command climberUpCommand = new RunCommand(() -> mClimber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_IN));
+    Command climberDownCommand = new RunCommand(() -> mClimber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_OUT));
+    Command climberStopCommand = Commands.runOnce(() -> mClimber.stopClimber());
+    controller.povUp().whileTrue(climberUpCommand).onFalse(climberStopCommand);
+    controller.povDown().whileTrue(climberDownCommand).onFalse(climberStopCommand);
   }
 
   public void configureKeyboardBindings() {
-    Command runSlowOut = new RunCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT));
+    Command runSlowOut = new RunCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT_IN_RADPERSEC));
     Command stopMotor = Commands.runOnce(() -> mRoller.stopRoller());
-    controller.y().whileTrue(runSlowOut).onFalse(stopMotor);
+    controller.leftBumper().whileTrue(runSlowOut).onFalse(stopMotor);
+
+    Command climberUpCommand = new RunCommand(() -> mClimber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_IN));
+    Command climberDownCommand = new RunCommand(() -> mClimber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_OUT));
+    Command climberStopCommand = Commands.runOnce(() -> mClimber.stopClimber());
+    controller.povUp().whileTrue(climberUpCommand).onFalse(climberStopCommand);
+    controller.povDown().whileTrue(climberDownCommand).onFalse(climberStopCommand);
   }
 
   /**
