@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -62,9 +62,9 @@ public class RobotContainer {
   // Arm Subsystem + Commands
   public final ArmSubsystem mArm = new ArmSubsystem();
   public Command armUpCommand =
-      new InstantCommand(() -> mArm.positionArm(Constants.ArmConstants.ARM_ROTATIONS_UP));
+      new InstantCommand(() -> mArm.positionArm(Constants.ArmConstants.ARM_ROTATIONS_STOW));
   public Command armDownCommand =
-      new InstantCommand(() -> mArm.positionArm(Constants.ArmConstants.ARM_ROTATIONS_DOWN));
+      new InstantCommand(() -> mArm.positionArm(Constants.ArmConstants.ARM_ROTATIONS_DEPLOY));
   public Command armStopCommand = new InstantCommand(() -> mArm.stopArm());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */

@@ -37,7 +37,7 @@ public class RollerIOTalonFX implements RollerIO {
     inputs.rollerAppliedVolts = rollerMotor.getMotorVoltage().getValueAsDouble();
     inputs.rollerCurrentAmps = rollerMotor.getSupplyCurrent().getValueAsDouble();
 
-    Logger.recordOutput("/Roller/velocityRotPerSec", rollerMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("/Roller/Velocity", rollerMotor.getVelocity().getValueAsDouble());
     Logger.recordOutput("/Roller/TargetVelocityIn", RollerConstants.ROLLER_SPEED_IN);
     Logger.recordOutput("/Roller/TargetVelocityOut", RollerConstants.ROLLER_SPEED_OUT);
   }

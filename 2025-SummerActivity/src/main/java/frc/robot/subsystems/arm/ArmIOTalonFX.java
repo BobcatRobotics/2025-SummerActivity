@@ -1,47 +1,46 @@
-package frc.robot.subsystems;
+package frc.robot.subsystems.arm;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionVoltage;
-// import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
+import org.littletonrobotics.junction.Logger;
 
-public class ArmSubsystem extends SubsystemBase {
-
+public class ArmIOTalonFX implements ArmIO {
   private final TalonFX armMotor;
-  // private final VelocityVoltage m_velocityVoltage = new VelocityVoltage(0).withSlot(0);
   private final PositionVoltage mPositionVoltage = new PositionVoltage(0).withSlot(0);
 
-  public ArmSubsystem() {
-    armMotor = new TalonFX(ArmConstants.ARM_MOTOR_ID);
+  public ArmIOTalonFX(int motorID) {
+    armMotor = new TalonFX(motorID);
 
     TalonFXConfiguration config = new TalonFXConfiguration();
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = ArmConstants.ARM_MOTOR_CURRENT_LIMIT;
-    config.CurrentLimits.StatorCurrentLimitEnable = true;
-    config.CurrentLimits.StatorCurrentLimit = ArmConstants.ARM_MOTOR_STATOR_CURRENT_LIMIT;
-    config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.25; // TODO tune this
-    config.Feedback.SensorToMechanismRatio = 75;
+    config.Feedback.SensorToMechanismRatio = 4;
 
     // Velocity PIDs
     config.Slot0.kP = 0.11; // TODO tune this
     config.Slot0.kI = 0;
     config.Slot0.kD = 0;
-
     armMotor.getConfigurator().apply(config);
   }
 
   @Override
-  public void periodic() {}
+  public void updateInputs(ArmIOinputs inputs) {
+    inputs.armConnected = armMotor.isConnected();
+    inputs.armPosition = armMotor.getPosition().getValueAsDouble();
+    inputs.armVelocity = armMotor.getVelocity().getValueAsDouble();
+    inputs.armAppliedVolts = armMotor.getMotorVoltage().getValueAsDouble();
+    inputs.armCurrentAmps = armMotor.getSupplyCurrent().getValueAsDouble();
 
-  // public void runArm(double speed) {
-  //   armMotor.setControl(m_velocityVoltage.withVelocity(speed));
-  // }
+    Logger.recordOutput("/Arm/Velocity", armMotor.getVelocity().getValueAsDouble());
+    Logger.recordOutput("/Arm/TargetVelocityStow", ArmConstants.ARM_ROTATIONS_STOW);
+    Logger.recordOutput("/Arm/TargetVelocityDeploy", ArmConstants.ARM_ROTATIONS_DEPLOY);
+  }
 
   public void positionArm(double pos) {
     double desiredRotations = pos * ArmConstants.ARM_PID_POSITION;

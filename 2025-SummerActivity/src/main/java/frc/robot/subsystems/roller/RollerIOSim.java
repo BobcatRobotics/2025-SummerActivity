@@ -11,12 +11,16 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import frc.robot.Constants.RollerConstants;
+import frc.robot.util.TunnableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class RollerIOSim implements RollerIO {
@@ -33,14 +37,24 @@ public class RollerIOSim implements RollerIO {
 
   private double simulatedPosition = 0.0;
   private double simulatedVelocity = 0.0;
-  // private double maxSimVelocity = 10.0; // rotations/sec
+  private double maxSimVelocity = 511.0; // rotations/sec
   private double maxAcceleration = 100.0; // RPS * RPS
   private final double simLoopPeriodSec = 0.02; // 20ms typical loop time
 
+  TunnableNumber kP;
+  TunnableNumber kD;
+  TalonFXConfiguration config;
+  private double simVoltage = 0.0;
+
+  private FlywheelSim mRollerSim;
+
   public RollerIOSim() {
+    var plant = LinearSystemId.createFlywheelSystem(DCMotor.getKrakenX60(1), 0.001, 25.0);
+    mRollerSim = new FlywheelSim(plant, DCMotor.getKrakenX60(1), 0.0);
+
     rollerMotor = new TalonFX(RollerConstants.ROLLER_MOTOR_ID);
 
-    TalonFXConfiguration config = new TalonFXConfiguration();
+    config = new TalonFXConfiguration();
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
@@ -48,9 +62,11 @@ public class RollerIOSim implements RollerIO {
     config.Feedback.SensorToMechanismRatio = 25; // 1:25 gear ratio
 
     // Velocity PIDs
-    config.Slot0.kP = 0.11; // TODO tune this
+    kP = new TunnableNumber("/Roller/kP", 0.11);
+    kD = new TunnableNumber("/Roller/kD", 0);
+    config.Slot0.kP = kP.get();
     config.Slot0.kI = 0;
-    config.Slot0.kD = 0;
+    config.Slot0.kD = kD.get();
     rollerMotor.getConfigurator().apply(config);
 
     // Get references to sensor signals
@@ -64,45 +80,49 @@ public class RollerIOSim implements RollerIO {
 
   @Override
   public void updateInputs(RollerIOinputs inputs) {
+    mRollerSim.update(simLoopPeriodSec);
+    kP.periodic();
+    kD.periodic();
+    if (kP.updateConfig) {
+      config.Slot0.kP = kP.get();
+      rollerMotor.getConfigurator().apply(config);
+    }
+    if(kD.updateConfig) {
+      config.Slot0.kD = kD.get();
+      rollerMotor.getConfigurator().apply(config);
+    }
+
     var motorStatus =
         BaseStatusSignal.refreshAll(
             relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
 
     inputs.rollerConnected = connectedDebounce.calculate(motorStatus.isOK());
-    inputs.rollerPosition = Units.rotationsToRadians(relativePosition.getValueAsDouble());
-    inputs.rollerVelocity = Units.rotationsToRadians(relativePosition.getValueAsDouble());
+    inputs.rollerPosition = relativePosition.getValueAsDouble();
+    var vel = mRollerSim.getAngularVelocity();
+    inputs.rollerVelocity = vel.baseUnitMagnitude();
     inputs.rollerAppliedVolts = rollerMotor.getMotorVoltage().getValueAsDouble();
     inputs.rollerCurrentAmps = rollerMotor.getSupplyCurrent().getValueAsDouble();
     // Simulated inputs would be updated here, but for now we leave it empty
 
-    Logger.recordOutput("/Roller/Velocity", simulatedVelocity);
-    Logger.recordOutput("/Roller/TargetVelocityIn", RollerConstants.ROLLER_SPEED_IN);
-    Logger.recordOutput("/Roller/TargetVelocityOut", RollerConstants.ROLLER_SPEED_OUT);
+    Logger.recordOutput("/Roller/Velocity", motorVelocity.getValueAsDouble());
+    Logger.recordOutput(
+        "/Roller/TargetVelocityIn", Units.radiansToRotations(RollerConstants.ROLLER_SPEED_IN));
+    Logger.recordOutput(
+        "/Roller/TargetVelocityOut", Units.radiansToRotations(RollerConstants.ROLLER_SPEED_OUT));
   }
 
   @Override
   public void runRoller(double speed) {
-    double velocityRotPerSec = Units.radiansToRotations(speed);
-    // Simulate gradual acceleration to the target velocity
-    double velocityError = velocityRotPerSec - simulatedVelocity;
-    double accel =
-        Math.signum(velocityError)
-            * Math.min(Math.abs(velocityError), maxAcceleration * simLoopPeriodSec);
-    simulatedVelocity += accel;
-
-    // Update position based on simulated velocity
-    simulatedPosition += simulatedVelocity * simLoopPeriodSec;
-
-    // Feed simulated values to the motor's sim state
-    simState.setRotorVelocity(simulatedVelocity);
-    simState.setRawRotorPosition(simulatedPosition);
-    simState.setSupplyVoltage(12.0); // simulate battery voltage
-    // Simulated roller control logic would go here, but for now we leave it empty
+    mRollerSim.setInputVoltage(speed / maxSimVelocity * 12);
+    mRollerSim.update(simLoopPeriodSec);
+    var vel = mRollerSim.getAngularVelocity();
+    rollerMotor.setControl(mVelocityVoltage.withVelocity(vel));
   }
 
   @Override
   public void stopRoller() {
     rollerMotor.stopMotor();
+    runRoller(0);
     // Simulated stop logic would go here, but for now we leave it empty
   }
 }
