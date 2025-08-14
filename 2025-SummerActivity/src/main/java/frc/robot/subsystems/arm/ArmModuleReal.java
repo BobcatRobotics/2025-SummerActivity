@@ -41,11 +41,11 @@ public class ArmModuleReal implements ArmModuleIO {
     this.motor = new TalonFX(id, bus);
 
     config = new TalonFXConfiguration();
-    config.Feedback.SensorToMechanismRatio = 75;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = Constants.RollerConstants.ROLLER_MOTOR_CURRENT_LIMIT;
+    config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = 0.25;
 
     // Apply initial configuration with retry logic
     motor.getConfigurator().apply(config, 0.25);
@@ -86,12 +86,13 @@ public class ArmModuleReal implements ArmModuleIO {
   }
 
   public void runArm(double positionInRotations) {
-    var request = positionControl.withPosition(positionInRotations);
-    motor.setControl(request);
+    // var request = positionControl.withPosition(positionInRotations);
+    // motor.setControl(request);
+    motor.set(positionInRotations);
     Logger.recordOutput("/Arm/positionInRotations", positionInRotations);
   }
 
-  public void stopARm() {
+  public void stopArm() {
     motor.stopMotor();
     Logger.recordOutput("/Arm/positionInRotations", 0);
   }

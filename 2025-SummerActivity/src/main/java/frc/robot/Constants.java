@@ -36,9 +36,9 @@ public final class Constants {
     public static final int ROLLER_MOTOR_ID = 10;
     public static final int ROLLER_MOTOR_CURRENT_LIMIT = 60;
     public static final double ROLLER_MOTOR_VOLTAGE_COMP = 10;
-    public static final double ROLLER_SLOW_SPEED_OUT_IN_RADPERSEC = 5;
-    public static final double ROLLER_FAST_SPEED_OUT_IN_RADPERSEC  = 10;
-    public static final double ROLLER_SPEED_IN = -0.1;
+    public static final double ROLLER_SLOW_SPEED_OUT_IN_RADPERSEC = 25;
+    public static final double ROLLER_FAST_SPEED_OUT_IN_RADPERSEC  = 100;
+    public static final double ROLLER_SPEED_IN = -25;
   }
   public static final class ArmConstants {
     public static final int ARM_MOTOR_ID = 9;
@@ -53,7 +53,20 @@ public final class Constants {
     public static final int CLIMBER_MOTOR_ID = 1;
     public static final double CLIMBER_SUPPLY = 50;
     public static final double CLIMBER_STATOR = 50;
-    public static final double CLIMBER_SPEED_OUT = -10.0;
-    public static final double CLIMBER_SPEED_IN = 10.0;
+    public static final double CLIMBER_SPEED_OUT = -0.6;
+    public static final double CLIMBER_SPEED_IN = 0.6;
+  }
+  public static final class AlgaeRemoverConstants{
+    public static final int ARM_ID = 11;
+    public static final double ARM_STATOR_LIMIT = 10;
+    public static final double ARM_SPEED_UP = -0.19;
+    public static final double ARM_PID_POSITION = 10;
+
+    public static final int ROLLER_ID = 12;
+    public static final double ROLLER_SPEED_OUT = 0.1;
+    public static final double ROLLER_SPEED_IN = -0.1;
+    public static final double ROLLER_PID_RPS = 10;
+    public static final double ROLLER_MOTOR_CURRENT_LIMIT = 60;
+
   }
 }

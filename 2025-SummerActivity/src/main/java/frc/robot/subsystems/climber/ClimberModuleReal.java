@@ -29,7 +29,7 @@ public class ClimberModuleReal implements ClimberModuleIO {
     motor.pid0.setI(kI.get());
     motor.pid0.setD(kD.get());
     motor.pid0.setFF(kFF.get());
-    motor.enableSoftLimits(true);
+    motor.enableSoftLimits(false);
     motor.setSoftLimits(revLimit.get(), forwardLimit.get());
   }
 
@@ -54,7 +54,8 @@ public class ClimberModuleReal implements ClimberModuleIO {
   }
 
   public void runClimber(double positionInDegrees) {
-    motor.setPosition(positionInDegrees);
+    Logger.recordOutput("/Climber/output",positionInDegrees);
+    motor.setPercent(positionInDegrees);
   }
 
   public void stopClimber() {

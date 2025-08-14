@@ -43,11 +43,11 @@ public class RollerModuleReal implements RollerModuleIO {
 
     config = new TalonFXConfiguration();
     config.Feedback.SensorToMechanismRatio = 25;
-    config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
     config.CurrentLimits.SupplyCurrentLimit = Constants.RollerConstants.ROLLER_MOTOR_CURRENT_LIMIT;
-
+    config.Slot0.kP = 0.5;
     // Apply initial configuration with retry logic
     motor.getConfigurator().apply(config, 0.25);
 

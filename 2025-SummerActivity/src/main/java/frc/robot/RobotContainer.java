@@ -41,6 +41,10 @@ import frc.robot.subsystems.climber.ClimberModuleSim;
 import frc.robot.subsystems.climber.ClimberModuleIO;
 import frc.robot.subsystems.climber.ClimberModuleReal;
 import frc.robot.subsystems.climber.ClimberSubsystem;
+import frc.robot.subsystems.algaeRemover.AlgaeRemoverIO;
+import frc.robot.subsystems.algaeRemover.AlgaeRemoverModuleReal;
+import frc.robot.subsystems.algaeRemover.AlgaeRemoverModuleSim;
+import frc.robot.subsystems.algaeRemover.AlgaeRemoverSubsystem;
 import frc.robot.subsystems.arm.ArmModuleIO;
 import frc.robot.subsystems.arm.ArmModuleReal;
 import frc.robot.subsystems.arm.ArmModuleSim;
@@ -72,6 +76,7 @@ public class RobotContainer {
   private final RollerSubsystem mRoller;
   private final ArmSubsystem mArm;
   private final ClimberSubsystem mClimber;
+  private final AlgaeRemoverSubsystem mAlgaeRemoverSubsystem;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -89,6 +94,7 @@ public class RobotContainer {
         mRoller = new RollerSubsystem(new RollerModuleReal(Constants.RollerConstants.ROLLER_MOTOR_ID, "rio"), "Roller");
         mArm = new ArmSubsystem(new ArmModuleReal(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
         mClimber = new ClimberSubsystem(new ClimberModuleReal(Constants.ClimberConstants.CLIMBER_MOTOR_ID, "rio"),"Climber");
+        mAlgaeRemoverSubsystem = new AlgaeRemoverSubsystem(new AlgaeRemoverModuleReal(Constants.AlgaeRemoverConstants.ARM_ID,Constants.AlgaeRemoverConstants.ROLLER_ID, "rio"),"AlgaeRemover");
         drive = new Drive(
             new GyroIOPigeon2(),
             new ModuleIOTalonFX(TunerConstants.FrontLeft),
@@ -105,6 +111,8 @@ public class RobotContainer {
         mRoller = new RollerSubsystem(new RollerModuleSim(Constants.RollerConstants.ROLLER_MOTOR_ID, "rio"), "Roller");
         mArm = new ArmSubsystem(new ArmModuleSim(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
         mClimber = new ClimberSubsystem(new ClimberModuleSim(Constants.ClimberConstants.CLIMBER_MOTOR_ID, "rio"),"Climber");
+        
+        mAlgaeRemoverSubsystem = new AlgaeRemoverSubsystem(new AlgaeRemoverModuleSim(Constants.AlgaeRemoverConstants.ARM_ID,Constants.AlgaeRemoverConstants.ROLLER_ID, "rio"),"AlgaeRemover");
         drive = new Drive(
             new GyroIO() {
             },
@@ -124,6 +132,9 @@ public class RobotContainer {
         }, "Arm");
         mClimber = new ClimberSubsystem(new ClimberModuleIO() {
         }, "Climber");
+        mAlgaeRemoverSubsystem = new AlgaeRemoverSubsystem(new AlgaeRemoverIO() {
+          
+        }, "AlgaeRemover");
         drive = new Drive(
             new GyroIO() {
             },
@@ -212,14 +223,27 @@ public class RobotContainer {
     Command climberUpCommand = new RunCommand(() -> mClimber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_IN));
     Command climberDownCommand = new RunCommand(() -> mClimber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_OUT));
     Command climberStopCommand = Commands.runOnce(() -> mClimber.stopClimber());
-    controller.povUp().whileTrue(climberUpCommand).onFalse(climberStopCommand);
-    controller.povDown().whileTrue(climberDownCommand).onFalse(climberStopCommand);
+    controller.leftTrigger().whileTrue(climberUpCommand).onFalse(climberStopCommand);
+    controller.rightTrigger().whileTrue(climberDownCommand).onFalse(climberStopCommand);
+
+    Command algaeRemoverRollerOutCommand = new RunCommand(() -> mAlgaeRemoverSubsystem.runRoller(Constants.AlgaeRemoverConstants.ROLLER_SPEED_OUT));
+    Command algaeRemoverRollerInCommand = new RunCommand(() -> mAlgaeRemoverSubsystem.runRoller(Constants.AlgaeRemoverConstants.ROLLER_SPEED_IN));
+  
+    Command algaeRemoverArmUpCommand = new RunCommand(() -> mAlgaeRemoverSubsystem.runArm(Constants.AlgaeRemoverConstants.ARM_SPEED_UP));
+    Command algaeRemoverArmDownCommand = new RunCommand(() -> mAlgaeRemoverSubsystem.runArm(-Constants.AlgaeRemoverConstants.ARM_SPEED_UP));
+    Command algaeRemoverArmStopCommand = Commands.runOnce(() -> mAlgaeRemoverSubsystem.stopRoller());
+    Command algaeRemoverRollerStopCommand = Commands.runOnce(() -> mAlgaeRemoverSubsystem.stopArm());
+    controller.povDown().whileTrue(algaeRemoverArmDownCommand).onFalse(algaeRemoverArmStopCommand);
+    controller.povUp().whileTrue(algaeRemoverArmUpCommand).onFalse(algaeRemoverArmStopCommand);
+    controller.povLeft().whileTrue(algaeRemoverRollerOutCommand).onFalse(algaeRemoverRollerStopCommand);
+    controller.povRight().whileTrue(algaeRemoverRollerInCommand).onFalse(algaeRemoverRollerStopCommand);
+
   }
 
   public void configureKeyboardBindings() {
     Command runSlowOut = new RunCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT_IN_RADPERSEC));
     Command stopMotor = Commands.runOnce(() -> mRoller.stopRoller());
-    controller.leftBumper().whileTrue(runSlowOut).onFalse(stopMotor);
+    controller.y().whileTrue(runSlowOut).onFalse(stopMotor);
 
     Command climberUpCommand = new RunCommand(() -> mClimber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_IN));
     Command climberDownCommand = new RunCommand(() -> mClimber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_OUT));
