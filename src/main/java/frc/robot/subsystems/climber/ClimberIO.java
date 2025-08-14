@@ -1,8 +1,46 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.climber;
 
-/** Add your docs here. */
-public class ClimberIO {}
+import org.littletonrobotics.junction.AutoLog;
+
+public interface ClimberIO {
+  @AutoLog
+  public static class ClimberModuleIOInputs {
+    /** Whether the motor is connected and responsive. */
+    public boolean connected = false;
+
+    /** Position of the motor in radians. */
+    public double positionRad = 0.0;
+
+    /** Velocity of the motor in radians per second. */
+    public double velocityRadPerSec = 0.0;
+
+    /** Voltage applied to the motor in volts. */
+    public double appliedVolts = 0.0;
+
+    /** Current drawn by the motor in amps. */
+    public double currentAmps = 0.0;
+
+    /** Current state of the motor, as defined by {@link MotorState}. */
+    public ClimberState state = ClimberState.IDLE;
+  }
+
+  /**
+   * Update the motor input values. This method is called periodically to refresh
+   * the telemetry data
+   * stored in {@link MotorIOInputs}.
+   *
+   * @param inputs The container to populate with the current motor telemetry
+   *               data.
+   */
+  public default void updateInputs(ClimberModuleIOInputs inputs) {
+  }
+
+  public default void runClimber(double positionInRotations) {
+  }
+
+  public default void stopClimber() {
+  }
+
+  public default void periodic() {
+  }
+}
