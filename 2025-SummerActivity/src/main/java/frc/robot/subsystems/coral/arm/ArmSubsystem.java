@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.arm;
+package frc.robot.subsystems.coral.arm;
 
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
@@ -13,8 +13,8 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ArmSubsystem extends SubsystemBase {
-  /** Creates a new Roller. */
-  private final TalonFX arm = new TalonFX(0, "rio");
+  /** Creates a new Arm. */
+  private final TalonFX arm = new TalonFX(9, "rio");
 
   private final VelocityDutyCycle velocity_request = new VelocityDutyCycle(0);
 
@@ -22,7 +22,7 @@ public class ArmSubsystem extends SubsystemBase {
     // Motor Configuration
     TalonFXConfiguration motor_config = new TalonFXConfiguration();
     motor_config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    motor_config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    motor_config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     motor_config.CurrentLimits.StatorCurrentLimit = 57;
     motor_config.CurrentLimits.StatorCurrentLimitEnable = true;
     motor_config.CurrentLimits.SupplyCurrentLimit = 57;
@@ -31,24 +31,29 @@ public class ArmSubsystem extends SubsystemBase {
     // Slot Configuration
     var Slot0Configs = new Slot0Configs();
     Slot0Configs.kP = 0.1;
-    Slot0Configs.kD = 0.0;
 
     // Add Slot Configuration to Motor Configuration
     motor_config.Slot0 = Slot0Configs;
 
-    // Apply Configuration to TalonFX roller
+    // Apply Configuration to TalonFX arm
     arm.getConfigurator().apply(motor_config);
   }
 
-  @Override
+  public void start_clockwise() {
+    spin_arm(0.177);
+  }
+
+  public void start_counterclockwise() {
+    spin_arm(-0.19);
+  }
+
   public void periodic() {
     // This method will be called once per scheduler run
   }
 
   // Sets speed of motor
   public void spin_arm(double rotations_per_second) {
-    velocity_request.withVelocity(rotations_per_second);
-    arm.setControl(velocity_request);
+    arm.set(rotations_per_second);
   }
 
   // Stops motor

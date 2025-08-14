@@ -25,13 +25,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.coral.arm.ArmSubsystem;
+import frc.robot.subsystems.coral.roller.RollerSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.roller.RollerSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -44,6 +45,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final RollerSubsystem rollerSubsystem;
+  private final ArmSubsystem armSubsystem;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -90,6 +92,8 @@ public class RobotContainer {
 
     // Setting roller subsystem
     rollerSubsystem = new RollerSubsystem();
+    // Setting arm subsystem
+    armSubsystem = new ArmSubsystem();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -141,11 +145,29 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Switch to LT pattern when LT is pressed
+    // Spin roller clockwise when Left Trigger is held down.
     controller
         .leftTrigger()
-        .whileTrue(new RunCommand(() -> rollerSubsystem.start()))
+        .whileTrue(new RunCommand(() -> rollerSubsystem.start_clockwise()))
         .onFalse(new RunCommand(() -> rollerSubsystem.stop_roller()));
+
+    // Spin roller counterclockwise when Right Trigger is held down.
+    controller
+        .rightTrigger()
+        .whileTrue(new RunCommand(() -> rollerSubsystem.start_counterclockwise()))
+        .onFalse(new RunCommand(() -> rollerSubsystem.stop_roller()));
+
+    // Spin arm clockwise when Left Bumper is held down.
+    controller
+        .leftBumper()
+        .whileTrue(new RunCommand(() -> armSubsystem.start_clockwise()))
+        .onFalse(new RunCommand(() -> armSubsystem.stop_arm()));
+
+    // Spin arm counterclockwise when Right Bumper is held down.
+    controller
+        .rightBumper()
+        .whileTrue(new RunCommand(() -> armSubsystem.start_counterclockwise()))
+        .onFalse(new RunCommand(() -> armSubsystem.stop_arm()));
 
     // Reset gyro to 0° when B button is pressed
     controller
