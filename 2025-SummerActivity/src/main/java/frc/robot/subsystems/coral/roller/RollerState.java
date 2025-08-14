@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.roller;
 
-public enum RollerState{
+public enum RollerState {
   FORWARD,
   REVERSE,
   STALL,

@@ -2,11 +2,11 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.arm;
+package frc.robot.subsystems.roller;
 
-public interface ArmModuleIO{
+public interface RollerModuleIO {
 
-  public static class ArmModuleIOInputs {
+  public static class RollerModuleIOInputs {
     public boolean connected = false;
 
     public double position = 0.0;
@@ -17,9 +17,12 @@ public interface ArmModuleIO{
 
     public double amps = 0.0;
 
-    public ArmState state = ArmState.STALL;
+    public RollerState state = RollerState.STALL;
   }
-  public default void updateInputs(ArmModuleIOInputs inputs){}
-  public default void runArm(double positionInRotations){}
-  public default void stopArm(){}
+
+  public default void updateInputs(RollerModuleIOInputs inputs) {}
+
+  public default void runRoller(double positionInRotations) {}
+
+  public default void stopRoller() {}
 }

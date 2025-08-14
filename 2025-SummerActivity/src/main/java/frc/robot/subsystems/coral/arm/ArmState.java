@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.arm;
 
-public enum ArmState{
+public enum ArmState {
   FORWARD,
   REVERSE,
   STALL,

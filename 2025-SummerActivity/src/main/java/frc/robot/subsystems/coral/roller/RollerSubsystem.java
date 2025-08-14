@@ -4,22 +4,22 @@
 
 package frc.robot.subsystems.roller;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class RollerSubsystem extends SubsystemBase {
   /** Creates a new Roller. */
-  private final TalonFX roller = new TalonFX(0, "rio");
+  private final TalonFX roller = new TalonFX(10, "rio");
+
   private final VelocityDutyCycle velocity_request = new VelocityDutyCycle(0);
-  
 
   public RollerSubsystem() {
-    //Motor Configuration
+    // Motor Configuration
     TalonFXConfiguration motor_config = new TalonFXConfiguration();
     motor_config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
     motor_config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
@@ -28,26 +28,26 @@ public class RollerSubsystem extends SubsystemBase {
     motor_config.CurrentLimits.SupplyCurrentLimit = 57;
     motor_config.CurrentLimits.SupplyCurrentLimitEnable = true;
 
-    //Slot Configuration
+    // Slot Configuration
     var Slot0Configs = new Slot0Configs();
     Slot0Configs.kP = 0.1;
 
-    //Add Slot Configuration to Motor Configuration
+    // Add Slot Configuration to Motor Configuration
     motor_config.Slot0 = Slot0Configs;
 
-    //Apply Configuration to TalonFX roller
+    // Apply Configuration to TalonFX roller
     roller.getConfigurator().apply(motor_config);
+  }
 
+  public void start_clockwise() {
+    spin_roller(60);
   }
-    public void start() {
-      spin_roller(60);
+
+  public void start_counterclockwise() {
+    spin_roller(-60);
   }
-  public void startWithY() {
-     start();
-    }
 
   @Override
-
   public void periodic() {
     // This method will be called once per scheduler run
   }
@@ -59,9 +59,7 @@ public class RollerSubsystem extends SubsystemBase {
   }
 
   // Stops motor
-  public void stop_roller(){
+  public void stop_roller() {
     roller.stopMotor();
   }
-
 }
-
