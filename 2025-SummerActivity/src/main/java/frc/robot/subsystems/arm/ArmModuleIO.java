@@ -32,7 +32,7 @@ public interface ArmModuleIO {
    * @param inputs The container to populate with the current motor telemetry data.
    */
   public default void updateInputs(ArmModuleIOInputs inputs) {}
-
+  public default void runArm(double positionInRotations,double velocity) {}
   public default void runArm(double positionInRotations) {}
   ;
 

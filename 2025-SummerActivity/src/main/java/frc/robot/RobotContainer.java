@@ -250,6 +250,13 @@ public class RobotContainer {
     Command climberStopCommand = Commands.runOnce(() -> mClimber.stopClimber());
     controller.povUp().whileTrue(climberUpCommand).onFalse(climberStopCommand);
     controller.povDown().whileTrue(climberDownCommand).onFalse(climberStopCommand);
+
+    // Arm Commands
+    Command armUpCommand = new RunCommand(() -> mArm.runArm(Constants.ArmConstants.ARM_SPEED_UP));
+    Command armDownCommand = new RunCommand(() -> mArm.runArm(Constants.ArmConstants.ARM_SPEED_DOWN));
+    Command armStopCommand = Commands.runOnce(() -> mArm.stopArm());
+    controller.a().whileTrue(armUpCommand).onFalse(armStopCommand);
+    controller.b().whileTrue(armDownCommand).onFalse(armStopCommand);
   }
 
   /**

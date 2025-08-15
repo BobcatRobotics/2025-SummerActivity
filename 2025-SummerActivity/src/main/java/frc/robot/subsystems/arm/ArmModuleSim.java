@@ -13,13 +13,17 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
+
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Constants;
 import frc.robot.subsystems.arm.ArmModuleIO.ArmModuleIOInputs;
 
@@ -38,14 +42,15 @@ public class ArmModuleSim implements ArmModuleIO {
   private PositionVoltage positionControl = new PositionVoltage(0);
   private VelocityVoltage velocityControl = new VelocityVoltage(0);
 
-  // Simulation
-  private final TalonFXSimState simState;
-
-  private double simulatedPosition = 0.0;
-  private double simulatedVelocity = 0.0;
-  private double maxSimVelocity = 10.0; // rotations/sec
-  private double maxAcceleration = 100.0; // RPS * RPS
-  private final double simLoopPeriodSec = 0.02; // 20ms typical loop time
+ // Simulation
+ private final SingleJointedArmSim armSim;
+ // Feedforward
+ private final ArmFeedforward feedforward = new ArmFeedforward(
+   0, // kS
+   0, // kG
+   0, // kV
+   0  // kA
+ );
 
   public ArmModuleSim(int id, String bus) {
 
@@ -72,11 +77,28 @@ public class ArmModuleSim implements ArmModuleIO {
         50.0, relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
     ParentDevice.optimizeBusUtilizationForAll(motor);
 
-    simState = motor.getSimState();
+
+    double armLength = 0.5;
+      // Initialize simulation
+      armSim = new SingleJointedArmSim(
+        DCMotor.getKrakenX60(1), // Motor type
+        config.Feedback.SensorToMechanismRatio,
+        SingleJointedArmSim.estimateMOI(armLength, 5), // Arm moment of inertia
+        armLength, // Arm length (m)
+        Units.degreesToRadians(0), // Min angle (rad)
+        Units.degreesToRadians(1.5707963267948966), // Max angle (rad)
+        true, // Simulate gravity
+        Units.degreesToRadians(0) // Starting position (rad)
+      );
   }
 
   @Override
   public void updateInputs(ArmModuleIOInputs inputs) {
+       // Set input voltage from motor controller to simulation
+   armSim.setInput(motor.getMotorVoltage().getValueAsDouble());
+   
+   // Update simulation by 20ms
+   armSim.update(0.020);
     var motorStatus =
         BaseStatusSignal.refreshAll(
             relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
@@ -98,31 +120,20 @@ public class ArmModuleSim implements ArmModuleIO {
     }
   }
 
+  public void runArm(double positionInRotations,double velocity) {
+    double ffVolts = feedforward.calculate(Units.rotationsToRadians(motor.getPosition().getValueAsDouble()),velocity);
+    motor.setControl(positionControl.withPosition(positionInRotations).withFeedForward(ffVolts));
+    Logger.recordOutput("/Arm/positionInRotations", positionInRotations);
+  }
+
   public void runArm(double positionInRotations) {
-    double error = positionInRotations - simulatedPosition;
-    double delta = Math.signum(error)
-            * Math.min(Math.abs(error), maxSimVelocity * simLoopPeriodSec);
-
-    simulatedPosition += delta;
-
-    simState.setRawRotorPosition(simulatedPosition);
-    simState.setRotorVelocity(delta / simLoopPeriodSec);
-    simState.setSupplyVoltage(12.0); // simulate battery voltage
-    Logger.recordOutput("/Arm/positionInRotations", simulatedPosition);
+    runArm(positionInRotations,0);
+    Logger.recordOutput("/Arm/positionInRotations", positionInRotations);
   }
 
   public void stopArm() {
-    //runRoller(0);
+    runArm(0);
     motor.stopMotor();
-    double error = simulatedPosition;
-    double delta = Math.signum(error)
-            * Math.min(Math.abs(error), maxSimVelocity * simLoopPeriodSec);
-
-    simulatedPosition += delta;
-
-    simState.setRawRotorPosition(simulatedPosition);
-    simState.setRotorVelocity(delta / simLoopPeriodSec);
-    simState.setSupplyVoltage(12.0);
-    Logger.recordOutput("/Arm/velocityRotPerSec", simulatedPosition);
+    Logger.recordOutput("/Arm/velocityRotPerSec", 0);
   }
 }
