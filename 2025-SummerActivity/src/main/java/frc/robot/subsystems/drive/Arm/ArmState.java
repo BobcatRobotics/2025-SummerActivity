@@ -1,8 +1,8 @@
 package frc.robot.subsystems.drive.Arm;
 
 public enum ArmState {
-    UNKNOWN,
-    FORWARD,
-    REVERSE,
-    IDLE
-  }
+  UNKNOWN,
+  FORWARD,
+  REVERSE,
+  IDLE
+}

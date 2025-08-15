@@ -24,15 +24,14 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.drive.Arm.ArmSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.drive.Arm.ArmSubsystem;
 import frc.robot.subsystems.drive.Roller.RollerSubsystem;
-
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -155,13 +154,28 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     controller
-        .y()
-        .whileTrue(Commands.run(() -> roller.spin_roller(20), roller))
+        .leftTrigger()
+        .whileTrue(
+            Commands.run(
+                () -> roller.spin_roller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT), roller))
         .onFalse(Commands.runOnce(() -> roller.stop_motor(), roller));
+    
+    controller
+        .rightTrigger()
+        .whileTrue(
+            Commands.run(
+                () -> roller.spin_roller(Constants.RollerConstants.ROLLER_SPEED_IN), roller))
+        .onFalse(Commands.runOnce(() -> roller.stop_motor(), roller));
+
 
     controller
         .rightBumper()
         .whileTrue(Commands.run(() -> arm.extendArm(), arm))
+        .onFalse(Commands.runOnce(() -> arm.stopMotor(), arm));
+
+    controller
+        .leftBumper()
+        .whileTrue(Commands.run(() -> arm.stowArm(), arm))
         .onFalse(Commands.runOnce(() -> arm.stopMotor(), arm));
   }
 

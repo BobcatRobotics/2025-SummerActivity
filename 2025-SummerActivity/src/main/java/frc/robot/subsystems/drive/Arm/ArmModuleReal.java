@@ -1,12 +1,11 @@
 package frc.robot.subsystems.drive.Arm;
 
-
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-import com.ctre.phoenix6.controls.PositionVoltage;
+// import com.ctre.phoenix6.controls.DutyCycleOut;
+// import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -17,60 +16,52 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.Constants;
-import frc.robot.subsystems.drive.Arm.ArmModuleIO.ArmModuleIOInputs;
+import org.littletonrobotics.junction.Logger;
 
 public class ArmModuleReal implements ArmModuleIO {
-
   private final TalonFX motor;
-  private final StatusSignal<Angle> relativePosition;
-  private final StatusSignal<AngularVelocity> motorVelocity;
-  private final StatusSignal<Voltage> motorAppliedVolts;
-  private final StatusSignal<Current> motorCurrent;
-  private final Debouncer connectedDebounce = new Debouncer(0.5);
+  private final StatusSignal<Angle> position;
+  private final StatusSignal<AngularVelocity> velocity;
+  private final StatusSignal<Voltage> voltage;
+  private final StatusSignal<Current> amps;
+  private final Debouncer debouncer = new Debouncer(0.5);
   private final TalonFXConfiguration config;
 
-  // Control mode objects reused for performance
-  //private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
-  private final PositionVoltage positionControl = new PositionVoltage(0);
-  //private final VelocityVoltage velocityControl = new VelocityVoltage(0);
+  // private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
+  // private final PositionVoltage positionControl = new PositionVoltage(0);
+  private final VelocityVoltage velocityControl = new VelocityVoltage(0);
 
   public ArmModuleReal(int id, String bus) {
-    this.motor = new TalonFX(id, bus);
+    this.motor = new TalonFX(9, "rio");
 
     config = new TalonFXConfiguration();
-    config.Feedback.SensorToMechanismRatio = 75;
     config.MotorOutput.Inverted = InvertedValue.CounterClockwise_Positive;
     config.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    config.CurrentLimits.StatorCurrentLimit = 40;
+    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    config.CurrentLimits.SupplyCurrentLimit = 40;
     config.CurrentLimits.SupplyCurrentLimitEnable = true;
-    config.CurrentLimits.SupplyCurrentLimit = Constants.RollerConstants.ROLLER_MOTOR_CURRENT_LIMIT;
 
-    // Apply initial configuration with retry logic
     motor.getConfigurator().apply(config, 0.25);
 
-    // Get references to sensor signals
-    relativePosition = motor.getPosition();
-    motorVelocity = motor.getVelocity();
-    motorAppliedVolts = motor.getMotorVoltage();
-    motorCurrent = motor.getStatorCurrent();
+    position = motor.getPosition();
+    velocity = motor.getVelocity();
+    voltage = motor.getMotorVoltage();
+    amps = motor.getStatorCurrent();
 
-    // Optimize CAN bus usage
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0, relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, position, velocity, voltage, amps);
     ParentDevice.optimizeBusUtilizationForAll(motor);
   }
 
   @Override
   public void updateInputs(ArmModuleIOInputs inputs) {
-    var motorStatus =
-        BaseStatusSignal.refreshAll(
-            relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
+    var motorStatus = BaseStatusSignal.refreshAll(position, velocity, voltage, amps);
 
-    inputs.connected = connectedDebounce.calculate(motorStatus.isOK());
-    inputs.positionRad = Units.rotationsToRadians(relativePosition.getValueAsDouble());
-    inputs.velocityRadPerSec = Units.rotationsToRadians(motorVelocity.getValueAsDouble());
-    inputs.appliedVolts = motorAppliedVolts.getValueAsDouble();
-    inputs.currentAmps = motorCurrent.getValueAsDouble();
+    inputs.connected = debouncer.calculate(motorStatus.isOK());
+    inputs.positionRad = Units.rotationsToRadians(position.getValueAsDouble());
+    inputs.velocityRadperSec = Units.rotationsToRadians(velocity.getValueAsDouble());
+    inputs.appliedVolts = voltage.getValueAsDouble();
+    inputs.Amps = amps.getValueAsDouble();
 
     if (inputs.appliedVolts > 0) {
       inputs.state = ArmState.FORWARD;
@@ -84,12 +75,13 @@ public class ArmModuleReal implements ArmModuleIO {
   }
 
   public void runArm(double positionInRotations) {
-    var request = positionControl.withPosition(positionInRotations);
+    var request = velocityControl.withVelocity(positionInRotations);
     motor.setControl(request);
+    motor.set(positionInRotations);
     Logger.recordOutput("/Arm/positionInRotations", positionInRotations);
   }
 
-  public void stopARm() {
+  public void stopArm() {
     motor.stopMotor();
     Logger.recordOutput("/Arm/positionInRotations", 0);
   }
