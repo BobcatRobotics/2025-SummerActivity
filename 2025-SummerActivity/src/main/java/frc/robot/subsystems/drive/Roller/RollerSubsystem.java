@@ -1,33 +1,40 @@
 package frc.robot.subsystems.drive.Roller;
-import org.littletonrobotics.junction.Logger;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
+
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class RollerSubsystem extends SubsystemBase {
-  private RollerModuleIO io;
-  private RollerModuleIOInputsAutoLogged inputs = new RollerModuleIOInputsAutoLogged();
-  private final Alert motorDisconnectedAlert = new Alert("motor disconnected!", AlertType.kWarning);
-  private final String name;
-  /** Creates a new roller. */
-  public RollerSubsystem(RollerModuleIO io, String name) {
-    this.io = io;
-    this.name = name;
+  private final TalonFX m_rollerMotor = new TalonFX(10, "rio"); // Assuming CAN ID 0
+  private final VelocityDutyCycle m_velocityRequest = new VelocityDutyCycle(0);
+
+  public RollerSubsystem() {
+    TalonFXConfiguration config = new TalonFXConfiguration();
+    config.Feedback.SensorToMechanismRatio = 25;
+    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+    config.CurrentLimits.StatorCurrentLimit = 20;
+    config.CurrentLimits.StatorCurrentLimitEnable = true;
+    var Slot0Configs = new Slot0Configs();
+    Slot0Configs.kP = 0.4;
+    config.Slot0 = Slot0Configs;
+
+    m_rollerMotor.getConfigurator().apply(config);
   }
 
   @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-    io.updateInputs(inputs);
-    Logger.processInputs(name, inputs);
-    motorDisconnectedAlert.set(!inputs.connected);
+  public void periodic() {}
+
+  public void spin_roller(double output) {
+    m_velocityRequest.withVelocity(output);
+    m_rollerMotor.setControl(m_velocityRequest);
   }
 
-  public void runRoller(double speedInRadians) {
-    io.runRoller(speedInRadians);
-  }
-
-  public void stopRoller() {
-    io.stopRoller();
+  public void stop_motor() {
+    m_rollerMotor.stopMotor();
   }
 }
