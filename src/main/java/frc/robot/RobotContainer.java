@@ -21,18 +21,23 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+//import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.subsystems.RollerSubsystem;
+import frc.robot.subsystems.arm.ArmModuleIO;
+import frc.robot.subsystems.arm.ArmModuleSim;
+import frc.robot.subsystems.arm.ArmModuleReal;
+import frc.robot.subsystems.arm.ArmSubsystem;
+//import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+//import frc.robot.subsystems.roller.RollerSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -44,7 +49,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final RollerSubsystem roller;
+  //private final RollerSubsystem roller;
   private final ArmSubsystem arm;
 
   // Controller
@@ -58,6 +63,7 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
+        arm = new ArmSubsystem(new ArmModuleReal(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "arm");
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -69,6 +75,7 @@ public class RobotContainer {
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
+        arm = new ArmSubsystem(new ArmModuleSim(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
         drive =
             new Drive(
                 new GyroIO() {},
@@ -80,6 +87,7 @@ public class RobotContainer {
 
       default:
         // Replayed robot, disable IO implementations
+        arm = new ArmSubsystem(new ArmModuleIO() {}, "arm");
         drive =
             new Drive(
                 new GyroIO() {},
@@ -88,9 +96,11 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         break;
+    
     }
-      roller = new RollerSubsystem();
-      arm = new ArmSubsystem();
+    
+    
+
       // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -138,18 +148,18 @@ public class RobotContainer {
                 () -> -controller.getLeftY(),
                 () -> -controller.getLeftX(),
                 () -> new Rotation2d()));
-    controller
+   /* controller
         .y()
         .whileTrue(Commands.run(() -> roller.spinroller(0), roller))
         .onFalse(Commands.run(() -> roller.stopmotor(), roller));
     controller
-        .leftBumper()
+       .leftBumper()
         .whileTrue(new RunCommand(() -> arm.extend()))
         .onFalse(new RunCommand(() -> arm.stopMotor()));
     controller
         .rightBumper()
         .whileTrue(new RunCommand(() -> arm.stow()))
-        .onFalse(new RunCommand(() -> arm.stopMotor()));
+        .onFalse(new RunCommand(() -> arm.stopMotor()));*/ 
 
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
@@ -164,6 +174,13 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    Command armUpCommand = new RunCommand(() -> arm.extend(Constants.ArmConstants.ARM_SPEED_UP));
+    Command armDownCommand = new RunCommand(() -> arm.extend(Constants.ArmConstants.ARM_SPEED_DOWN));
+    Command armStopCommand = Commands.runOnce(() -> arm.stopMotor());
+    controller.rightBumper().whileTrue(armUpCommand).onFalse(armStopCommand);
+    controller.leftBumper().whileTrue(armDownCommand).onFalse(armStopCommand);
+      
   }
 
   /**

@@ -23,7 +23,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.console.RIOConsoleSource;
+//import org.littletonrobotics.junction.console.RIOConsoleSource;
 
 public class Module {
   private final ModuleIO io;
