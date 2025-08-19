@@ -45,12 +45,39 @@ public final class Constants {
   public static final class ArmConstants {
     public static final int ARM_MOTOR_ID = 9;
     public static final int ARM_MOTOR_CURRENT_LIMIT = 20;
-    public static final double ARM_ROTATIONS_STOW = -1;
-    public static final double ARM_ROTATIONS_DEPLOY = 1;
-    // public static final double ARM_HOLD_DOWN = 0.1;
-    // public static final double ARM_HOLD_UP = -0.15;
-    public static final int ARM_SWITCH_PORT = 0;
+    public static final double ARM_ROTATIONS_STOW = -0.19;
+    public static final double ARM_ROTATIONS_DEPLOY = 0.177;
     public static final double ARM_MOTOR_STATOR_CURRENT_LIMIT = 10;
     public static final double ARM_PID_POSITION = 10;
+
+    public static final double ARM_MAX_POSITION = 0;
+    public static final double ARM_MIN_POSITION = -33.44;
+
+    // SOFT LIMITS for dealgaefier arm and arm
+  }
+
+  public static final class ClimberConstants {
+    public static final int CLIMBER_MOTOR_ID = 1;
+    public static final double CLIMBER_SUPPLY = 50;
+    public static final double CLIMBER_STATOR = 50;
+    public static final double CLIMBER_SPEED_OUT = -0.6;
+    public static final double CLIMBER_SPEED_IN = 0.6;
+  }
+
+  public static final class DealgaefierConstants {
+    public static final int ARM_MOTOR_ID = 11;
+    public static final int ARM_MOTOR_CURRENT_LIMIT = 10;
+    public static final double ARM_SPEED_DOWN = 0.8;
+    public static final double ARM_SPEED_UP = -0.8;
+    public static final double ARM_MOTOR_STATOR_CURRENT_LIMIT = 10;
+    public static final double ARM_PID_POSITION = 10;
+
+    public static final double ARM_MIN_POSITION = 0;
+    public static final double ARM_MAX_POSITION = 7.38;
+
+    public static final int ROLLER_MOTOR_ID = 12;
+    public static final int ROLLER_MOTOR_CURRENT_LIMIT = 60;
+    public static final double ROLLER_SPEED_OUT = 100;
+    public static final double ROLLER_SPEED_IN = -100;
   }
 }

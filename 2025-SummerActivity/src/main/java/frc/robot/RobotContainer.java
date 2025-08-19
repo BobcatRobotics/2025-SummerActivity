@@ -14,25 +14,23 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.algae.AlgaeSubsystem;
+import frc.robot.subsystems.climber.ClimberSubsystem;
+import frc.robot.subsystems.dealgaefier.DeAlgaefierSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.roller.RollerSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -51,21 +49,44 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
-  // Roller Subsystem + Commands
-  public final RollerSubsystem mRoller = new RollerSubsystem();
+  // Algae Subsystem + Commands
+  public final AlgaeSubsystem mAlgae = new AlgaeSubsystem();
   public Command rollerInCommand =
-      new InstantCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SPEED_IN));
+      new InstantCommand(() -> mAlgae.runRoller(Constants.RollerConstants.ROLLER_SPEED_IN));
   public Command rollerOutCommand =
-      new InstantCommand(() -> mRoller.runRoller(Constants.RollerConstants.ROLLER_SPEED_OUT));
-  public Command rollerStopCommand = new InstantCommand(() -> mRoller.stopRoller());
+      new InstantCommand(() -> mAlgae.runRoller(Constants.RollerConstants.ROLLER_SPEED_OUT));
+  public Command rollerStopCommand = new InstantCommand(() -> mAlgae.stopRoller());
 
-  // Arm Subsystem + Commands
-  public final ArmSubsystem mArm = new ArmSubsystem();
-  public Command armUpCommand =
-      new InstantCommand(() -> mArm.positionArm(Constants.ArmConstants.ARM_ROTATIONS_STOW));
-  public Command armDownCommand =
-      new InstantCommand(() -> mArm.positionArm(Constants.ArmConstants.ARM_ROTATIONS_DEPLOY));
-  public Command armStopCommand = new InstantCommand(() -> mArm.stopArm());
+  public Command armDeployCommand =
+      new InstantCommand(() -> mAlgae.runArm(Constants.ArmConstants.ARM_ROTATIONS_DEPLOY));
+  public Command armStowCommand =
+      new InstantCommand(() -> mAlgae.runArm(Constants.ArmConstants.ARM_ROTATIONS_STOW));
+  public Command armStopCommand = new InstantCommand(() -> mAlgae.stopArm());
+
+  // DeAlgaefier Subsystem + Commands
+  public final DeAlgaefierSubsystem mDeAlgaefier = new DeAlgaefierSubsystem();
+  public Command deAlgaefierUpCommand =
+      new InstantCommand(() -> mDeAlgaefier.runArm(Constants.DealgaefierConstants.ARM_SPEED_DOWN));
+  public Command deAlgaefierDownCommand =
+      new InstantCommand(() -> mDeAlgaefier.runArm(Constants.DealgaefierConstants.ARM_SPEED_UP));
+
+  public Command deAlgaefierInCommand =
+      new InstantCommand(
+          () -> mDeAlgaefier.runRoller(Constants.DealgaefierConstants.ROLLER_SPEED_IN));
+  public Command deAlgaefierOutCommand =
+      new InstantCommand(
+          () -> mDeAlgaefier.runRoller(Constants.DealgaefierConstants.ROLLER_SPEED_OUT));
+
+  public Command deAlgaefierArmStopCommand = new InstantCommand(() -> mDeAlgaefier.stopArm());
+  public Command deAlgaefierRollerStopCommand = new InstantCommand(() -> mDeAlgaefier.stopRoller());
+
+  // Climber Subsystem + Commands
+  public final ClimberSubsystem mClimber = new ClimberSubsystem();
+  public Command climberInCommand =
+      new InstantCommand(() -> mClimber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_IN));
+  public Command climberOutCommand =
+      new InstantCommand(() -> mClimber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_OUT));
+  public Command climberStopCommand = new InstantCommand(() -> mClimber.stopClimber());
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
@@ -143,33 +164,42 @@ public class RobotContainer {
             () -> -controller.getRightX()));
 
     // Lock to 0 when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
+    // controller
+    //     .a()
+    //     .whileTrue(
+    //         DriveCommands.joystickDriveAtAngle(
+    //             drive,
+    //             () -> -controller.getLeftY(),
+    //             () -> -controller.getLeftX(),
+    //             () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    // controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0 when B button is pressed
-    controller
-        .b()
-        .onTrue(
-            Commands.runOnce(
-                    () ->
-                        drive.setPose(
-                            new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
-                    drive)
-                .ignoringDisable(true));
+    // controller
+    //     .b()
+    //     .onTrue(
+    //         Commands.runOnce(
+    //                 () ->
+    //                     drive.setPose(
+    //                         new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
+    //                 drive)
+    //             .ignoringDisable(true));
 
     controller.leftBumper().whileTrue(rollerInCommand).onFalse(rollerStopCommand);
     controller.rightBumper().whileTrue(rollerOutCommand).onFalse(rollerStopCommand);
-    controller.leftTrigger().whileTrue(armUpCommand).onFalse(armStopCommand);
-    controller.rightTrigger().whileTrue(armDownCommand).onFalse(armStopCommand);
+
+    controller.leftTrigger().whileTrue(armDeployCommand).onFalse(armStopCommand);
+    controller.rightTrigger().whileTrue(armStowCommand).onFalse(armStopCommand);
+
+    controller.a().whileTrue(deAlgaefierUpCommand).onFalse(deAlgaefierArmStopCommand);
+    controller.b().whileTrue(deAlgaefierDownCommand).onFalse(deAlgaefierArmStopCommand);
+    controller.x().whileTrue(deAlgaefierInCommand).onFalse(deAlgaefierRollerStopCommand);
+    controller.y().whileTrue(deAlgaefierOutCommand).onFalse(deAlgaefierRollerStopCommand);
+
+    controller.back().whileTrue(climberInCommand).onFalse(climberStopCommand);
+    controller.start().whileTrue(climberOutCommand).onFalse(climberStopCommand);
   }
 
   /**
