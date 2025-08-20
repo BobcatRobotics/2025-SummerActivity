@@ -177,6 +177,7 @@ public class RobotContainer {
         .leftBumper()
         .whileTrue(Commands.run(() -> arm.stowArm(), arm))
         .onFalse(Commands.runOnce(() -> arm.stopMotor(), arm));
+    
   }
 
   /**

@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class AlgaeRemoverSubsystem extends SubsystemBase {
   private AlgaeRemoverIO io;
   private AlgaeRemoverIOInputsAutoLogged inputs = new AlgaeRemoverIOInputsAutoLogged();
-  private final Alert disconnectedAlert = new Alert("motor disconnected!", AlertType.kWarning);
+  private final Alert disconnectedAlert = new Alert("Motor Disconnected", AlertType.kWarning);
   private final String name;
   public AlgaeRemoverSubsystem(AlgaeRemoverIO io, String name) {
     this.io = io;

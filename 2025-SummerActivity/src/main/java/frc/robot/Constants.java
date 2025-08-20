@@ -53,4 +53,17 @@ public final class Constants {
     public static final int ARM_SWITCH_PORT = 0;
     public static final double ARM_MOTOR_STATOR_CURRENT_LIMIT = 10;
   }
+
+  public static final class AlgaeRemoverConstants{
+    public static final int ARM_ID = 11;
+    public static final double ARM_STATOR_LIMIT = 10;
+    public static final double ARM_SPEED_UP = -0.19;
+    public static final double ARM_PID_POSITION = 10;
+
+    public static final int ROLLER_ID = 12;
+    public static final double ROLLER_SPEED_OUT = 0.1;
+    public static final double ROLLER_SPEED_IN = -0.1;
+    public static final double ROLLER_PID_RPS = 10;
+    public static final double ROLLER_MOTOR_CURRENT_LIMIT = 60;
+  }
 }
