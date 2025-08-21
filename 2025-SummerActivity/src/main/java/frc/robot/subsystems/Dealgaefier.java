@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class Dealgaefier extends SubsystemBase {
   /** Creates a new Roller and Arm. */
   private final TalonFX roller = new TalonFX(12, "rio");
+
   private final TalonFX arm = new TalonFX(11, "rio");
 
   private final VelocityDutyCycle velocity_request = new VelocityDutyCycle(0);

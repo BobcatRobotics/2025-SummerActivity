@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Dealgaefier;
 import frc.robot.subsystems.coral.arm.ArmSubsystem;
 import frc.robot.subsystems.coral.roller.RollerSubsystem;
@@ -48,6 +49,7 @@ public class RobotContainer {
   private final RollerSubsystem rollerSubsystem;
   private final ArmSubsystem armSubsystem;
   private final Dealgaefier dealgaefier;
+  private final Climber climber;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -98,6 +100,8 @@ public class RobotContainer {
     armSubsystem = new ArmSubsystem();
     // Setting dealgaefier subsystem
     dealgaefier = new Dealgaefier();
+    // Setting climber subsystem
+    climber = new Climber();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -136,7 +140,7 @@ public class RobotContainer {
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
 
-    // Lock to 0° when A button is held
+    // Lock to 0° when A button is held.
     controller
         .a()
         .whileTrue(
@@ -197,7 +201,19 @@ public class RobotContainer {
         .whileTrue(new RunCommand(() -> dealgaefier.start_counterclockwise_arm()))
         .onFalse(new RunCommand(() -> dealgaefier.stop_arm()));
 
-    // Reset gyro to 0° when B button is pressed
+    // Hook climber to cage when X is pressed.
+    controller
+        .x()
+        .whileTrue(new RunCommand(() -> climber.hook()))
+        .onFalse(new RunCommand(() -> climber.stop()));
+
+    // Release climber from cage when Y is pressed.
+    controller
+        .y()
+        .whileTrue(new RunCommand(() -> climber.release()))
+        .onFalse(new RunCommand(() -> climber.stop()));
+
+    // Reset gyro to 0° when B button is pressed.
     controller
         .b()
         .onTrue(
