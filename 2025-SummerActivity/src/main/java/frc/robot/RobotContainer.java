@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.Dealgaefier;
 import frc.robot.subsystems.coral.arm.ArmSubsystem;
 import frc.robot.subsystems.coral.roller.RollerSubsystem;
 import frc.robot.subsystems.drive.Drive;
@@ -46,6 +47,7 @@ public class RobotContainer {
   private final Drive drive;
   private final RollerSubsystem rollerSubsystem;
   private final ArmSubsystem armSubsystem;
+  private final Dealgaefier dealgaefier;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -94,6 +96,8 @@ public class RobotContainer {
     rollerSubsystem = new RollerSubsystem();
     // Setting arm subsystem
     armSubsystem = new ArmSubsystem();
+    // Setting dealgaefier subsystem
+    dealgaefier = new Dealgaefier();
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
 
@@ -145,29 +149,53 @@ public class RobotContainer {
     // Switch to X pattern when X button is pressed
     controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
-    // Spin roller clockwise when Left Trigger is held down.
+    // Spin coral roller clockwise when Left Trigger is held down.
     controller
         .leftTrigger()
         .whileTrue(new RunCommand(() -> rollerSubsystem.start_clockwise()))
         .onFalse(new RunCommand(() -> rollerSubsystem.stop_roller()));
 
-    // Spin roller counterclockwise when Right Trigger is held down.
+    // Spin coral roller counterclockwise when Right Trigger is held down.
     controller
         .rightTrigger()
         .whileTrue(new RunCommand(() -> rollerSubsystem.start_counterclockwise()))
         .onFalse(new RunCommand(() -> rollerSubsystem.stop_roller()));
 
-    // Spin arm clockwise when Left Bumper is held down.
+    // Spin corral arm clockwise when Left Bumper is held down.
     controller
         .leftBumper()
         .whileTrue(new RunCommand(() -> armSubsystem.start_clockwise()))
         .onFalse(new RunCommand(() -> armSubsystem.stop_arm()));
 
-    // Spin arm counterclockwise when Right Bumper is held down.
+    // Spin coral arm counterclockwise when Right Bumper is held down.
     controller
         .rightBumper()
         .whileTrue(new RunCommand(() -> armSubsystem.start_counterclockwise()))
         .onFalse(new RunCommand(() -> armSubsystem.stop_arm()));
+
+    // Spin algae roller counterclockwise when left pov is held down.
+    controller
+        .povLeft()
+        .whileTrue(new RunCommand(() -> dealgaefier.start_counterclockwise_roller()))
+        .onFalse(new RunCommand(() -> dealgaefier.stop_roller()));
+
+    // Spin algae roller clockwise when right pov is held down.
+    controller
+        .povRight()
+        .whileTrue(new RunCommand(() -> dealgaefier.start_clockwise_roller()))
+        .onFalse(new RunCommand(() -> dealgaefier.stop_roller()));
+
+    // Spin algae arm clockwise when up pov is held down.
+    controller
+        .povUp()
+        .whileTrue(new RunCommand(() -> dealgaefier.start_clockwise_arm()))
+        .onFalse(new RunCommand(() -> dealgaefier.stop_arm()));
+
+    // Spin algae arm counterclockwise when down pov is held down.
+    controller
+        .povDown()
+        .whileTrue(new RunCommand(() -> dealgaefier.start_counterclockwise_arm()))
+        .onFalse(new RunCommand(() -> dealgaefier.stop_arm()));
 
     // Reset gyro to 0° when B button is pressed
     controller
