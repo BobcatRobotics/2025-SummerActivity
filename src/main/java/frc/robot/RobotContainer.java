@@ -37,6 +37,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.roller.RollerModuleIO;
+import frc.robot.subsystems.roller.RollerModuleReal;
+import frc.robot.subsystems.roller.RollerSubsystem;
 //import frc.robot.subsystems.roller.RollerSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -49,7 +52,7 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  //private final RollerSubsystem roller;
+  private final RollerSubsystem roller;
   private final ArmSubsystem arm;
 
   // Controller
@@ -64,6 +67,7 @@ public class RobotContainer {
       case REAL:
         // Real robot, instantiate hardware IO implementations
         arm = new ArmSubsystem(new ArmModuleReal(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "arm");
+        roller = new RollerSubsystem(new RollerModuleReal(Constants.RollerConstants.ROLLER_MOTOR_ID,"rio"), "roller");
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -76,6 +80,7 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         arm = new ArmSubsystem(new ArmModuleSim(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
+        roller = new RollerSubsystem(new RollerModuleReal(9, "rio"), "roller");
         drive =
             new Drive(
                 new GyroIO() {},
@@ -88,6 +93,7 @@ public class RobotContainer {
       default:
         // Replayed robot, disable IO implementations
         arm = new ArmSubsystem(new ArmModuleIO() {}, "arm");
+        roller = new RollerSubsystem(new RollerModuleIO() {}, "roller");
         drive =
             new Drive(
                 new GyroIO() {},
@@ -180,7 +186,13 @@ public class RobotContainer {
     Command armStopCommand = Commands.runOnce(() -> arm.stopMotor());
     controller.rightBumper().whileTrue(armUpCommand).onFalse(armStopCommand);
     controller.leftBumper().whileTrue(armDownCommand).onFalse(armStopCommand);
-      
+
+    Command rollCommand = new RunCommand(() -> roller.runRoller(Constants.RollerConstants.ROLLER_FAST_SPEEDOUT_IN_RADPERSEC));
+    Command rollCommand2 = new RunCommand(() -> roller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEEDOUT_IN_RADPERSEC));
+    Command rollStop = new RunCommand(()-> roller.stopRoller());
+    controller.rightBumper().whileTrue(rollCommand).onFalse(rollStop);
+    controller.leftBumper().whileTrue(rollCommand2).onFalse(rollStop);
+
   }
 
   /**

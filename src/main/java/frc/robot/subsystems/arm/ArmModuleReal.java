@@ -70,11 +70,14 @@ public class ArmModuleReal implements ArmModuleIO {
       }
     }
 
-    public void runArm(double positionInRotations){
+    public void extended(double positionInRotations){
       motor.set(positionInRotations);
       Logger.recordOutput("/Arm/positionInRotations", positionInRotations);
     }
     public void stopArm(){
-
+      motor.stopMotor();
+    }
+    public void periodic(){
+      
     }
 }

@@ -4,48 +4,39 @@
 
 package frc.robot.subsystems.roller;
 
-import com.ctre.phoenix6.configs.Slot0Configs;
-//import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
-//import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.VelocityDutyCycle;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
+import org.littletonrobotics.junction.Logger;
+
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 public class RollerSubsystem extends SubsystemBase {
-  /** Creates a new ArmSubsystem. */
-  private final TalonFX mainMotor = new TalonFX(25, "rio"); //Added a single TalonFX motor
-  private final VelocityDutyCycle motorRequest = new VelocityDutyCycle(0);
-  //private final DutyCycleOut m_MotorRequest = new DutyCycleOut(0);
-  //Used for Duty Cycle
-  public RollerSubsystem() {
-    //Config setting 1: Make new configuration for motor
-    TalonFXConfiguration config = new TalonFXConfiguration();
-    //Config setting 1: Set inverted direction
-    config.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
-    //Config setting 1: Coast motion
-    config.MotorOutput.NeutralMode = NeutralModeValue.Coast;
-    //Config setting 3+4: Set Stator/Supply
-    config.CurrentLimits.StatorCurrentLimit =  20;
-    config.CurrentLimits.StatorCurrentLimitEnable =  true;
-
-    var Slot0Configs = new Slot0Configs();
-    Slot0Configs.kP = 0.4;
-    config.Slot0 = Slot0Configs;
-
-    mainMotor.getConfigurator().apply(config); //Applies motor configurations
+  private RollerModuleIO io;
+  private RollerModuleInputsAutoLogged inputs = new RollerModuleInputsAutoLogged();
+  private final Alert motorDisconnectedAlert = new Alert("motor disconnected!", AlertType.kWarning);
+  private final String name;
+  /** Creates a new roller. */
+  public RollerSubsystem(RollerModuleIO io, String name) {
+    this.io = io;
+    this.name = name;
   }
-  public void spinroller(double output) {
-    motorRequest.withVelocity(output);
-    mainMotor.setControl(motorRequest);
-}
-public void stopmotor() {
-  mainMotor.stopMotor();
-}
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    io.periodic();
+    io.changeInputs(inputs);
+    Logger.processInputs(name, inputs);
+    motorDisconnectedAlert.set(!inputs.connected);
+
+  }
+
+  public void runRoller(double speedInRadians) {
+    io.Roll(speedInRadians);
+  }
+
+  public void stopRoller() {
+    io.stopRoller();
   }
 }
 

@@ -91,4 +91,7 @@ public class ArmModuleSim implements ArmModuleIO {
         motor.stopMotor();
         Logger.recordOutput("/Arm/velocityRotPerSec", 0);
     }
+    public void periodic(){
+      
+    }
 }
