@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -31,6 +32,8 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.drive.AlgaeRemover.AlgaeRemoverModuleReal;
+import frc.robot.subsystems.drive.AlgaeRemover.AlgaeRemoverSubsystem;
 import frc.robot.subsystems.drive.Roller.RollerSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -45,6 +48,7 @@ public class RobotContainer {
   private final Drive drive;
   private final RollerSubsystem roller;
   private final ArmSubsystem arm;
+  private final AlgaeRemoverSubsystem algaeRemover;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -90,6 +94,7 @@ public class RobotContainer {
     }
     roller = new RollerSubsystem();
     arm = new ArmSubsystem();
+    algaeRemover = new AlgaeRemoverSubsystem(new AlgaeRemoverModuleReal(11, 12, "rio"),"");
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -161,7 +166,7 @@ public class RobotContainer {
         .onFalse(Commands.runOnce(() -> roller.stop_motor(), roller));
     
     controller
-        .rightTrigger()
+         .rightTrigger()
         .whileTrue(
             Commands.run(
                 () -> roller.spin_roller(Constants.RollerConstants.ROLLER_SPEED_IN), roller))
@@ -170,13 +175,49 @@ public class RobotContainer {
 
     controller
         .rightBumper()
-        .whileTrue(Commands.run(() -> arm.extendArm(), arm))
+        .whileTrue(new RunCommand(() -> arm.extendArm(), arm))
         .onFalse(Commands.runOnce(() -> arm.stopMotor(), arm));
 
     controller
         .leftBumper()
-        .whileTrue(Commands.run(() -> arm.stowArm(), arm))
+        .whileTrue(new RunCommand(() -> arm.stowArm(), arm))
         .onFalse(Commands.runOnce(() -> arm.stopMotor(), arm));
+
+    controller
+        .povDown()
+        .whileTrue(
+            Commands.run(
+                () -> algaeRemover.runArm(-Constants.AlgaeRemoverConstants.ARM_SPEED_UP)))
+        .onFalse(
+            Commands.runOnce(
+                () -> algaeRemover.stopRoller()));
+
+    controller
+        .povUp()
+        .whileTrue(
+            Commands.run(
+                () -> algaeRemover.runArm(Constants.AlgaeRemoverConstants.ARM_SPEED_UP)))
+        .onFalse(
+            Commands.runOnce(
+                () -> algaeRemover.stopRoller()));
+
+    controller
+        .povLeft()
+        .whileTrue(
+                    Commands.run(
+                        () -> algaeRemover.runRoller(Constants.AlgaeRemoverConstants.ROLLER_SPEED_IN)))
+                .onFalse(
+                    Commands.runOnce(
+                        () -> algaeRemover.stopRoller()));
+        
+   controller
+        .povRight()
+        .whileTrue(
+                    Commands.run(
+                        () -> algaeRemover.runRoller(Constants.AlgaeRemoverConstants.ROLLER_SPEED_OUT)))
+                .onFalse(
+                    Commands.runOnce(
+                        () -> algaeRemover.stopRoller()));     
     
   }
 

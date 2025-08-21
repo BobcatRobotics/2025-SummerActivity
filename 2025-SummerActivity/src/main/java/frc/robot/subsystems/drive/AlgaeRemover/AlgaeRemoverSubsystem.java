@@ -16,7 +16,7 @@ public class AlgaeRemoverSubsystem extends SubsystemBase {
     this.name = name;
   }
 
-  @Override
+@Override
   public void periodic() {
     io.updateInputs(inputs);
     Logger.processInputs(name, inputs);

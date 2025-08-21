@@ -1,5 +1,8 @@
 package frc.robot.subsystems.drive.Climber;
 
-public class ClimberState {
-
+public enum ClimberState {
+    UNKNOWN,
+    FORWARD,
+    REVERSE,
+    IDLE,
 }

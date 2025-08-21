@@ -1,5 +1,5 @@
 package frc.robot.subsystems.drive.Climber;
 
-public class ClimberModuleSim {
+public class ClimberModuleSim implements ClimberModuleIO {
 
 }
