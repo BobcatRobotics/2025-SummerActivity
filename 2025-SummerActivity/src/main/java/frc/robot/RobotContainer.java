@@ -23,8 +23,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.algae.Algae;
 import frc.robot.subsystems.algaeRemover.AlgaeRemover;
-import frc.robot.subsystems.arm.Arm;
 import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -32,7 +32,6 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.roller.Roller;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -44,10 +43,11 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final Roller roller;
-  private final Arm arm = new Arm();
+  // private final Roller roller = new Roller();
+  // private final Arm arm = new Arm();
   private final AlgaeRemover algaeRemover = new AlgaeRemover();
   private final Climber climber = new Climber();
+  private final Algae algae = new Algae();
 
   private final Command setRollerFullSpeed;
   private final Command setRollerReverseFullSpeed;
@@ -73,8 +73,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
-    roller = new Roller();
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
@@ -128,12 +126,12 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    setRollerFullSpeed = new RunCommand(() -> roller.setSpeed(100), roller);
-    setRollerReverseFullSpeed = new RunCommand(() -> roller.setSpeed(-100), roller);
-    stopRoller = new InstantCommand(() -> roller.stopRoller());
-    armIn = new RunCommand(() -> arm.setPosition(-.19));
-    armOut = new RunCommand(() -> arm.setPosition(.177));
-    stopArm = new InstantCommand(() -> arm.stopArm());
+    setRollerFullSpeed = new RunCommand(() -> algae.setRollerSpeed(100), algae);
+    setRollerReverseFullSpeed = new RunCommand(() -> algae.setRollerSpeed(-100), algae);
+    stopRoller = new InstantCommand(() -> algae.stopRoller());
+    armIn = new RunCommand(() -> algae.setArmSpeed(-.19));
+    armOut = new RunCommand(() -> algae.setArmSpeed(.177));
+    stopArm = new InstantCommand(() -> algae.stopArm());
     algaeRemoverFullSpeed = new RunCommand(() -> algaeRemover.setSpeed(100), algaeRemover);
     algaeRemoverReverseFullSpeed = new RunCommand(() -> algaeRemover.setSpeed(-100), algaeRemover);
     algaeRemoverForward = new RunCommand(() -> algaeRemover.setSpeed(100), algaeRemover);
