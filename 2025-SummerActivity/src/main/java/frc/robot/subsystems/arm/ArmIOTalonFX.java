@@ -1,11 +1,4 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
-// Arm has to move in one direction when a button is pressed and the other direction when another
-// button is pressed
-
-package frc.robot.subsystems;
+package frc.robot.subsystems.arm;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -14,13 +7,13 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Arm extends SubsystemBase {
-  final TalonFX armMotor = new TalonFX(0, "rio");
+public class ArmIOTalonFX implements ArmIO {
+  final TalonFX armMotor = new TalonFX(9, "rio");
+  // create a position closed-loop request, voltage output, slot 0 configs
+  final PositionVoltage armMotorRequest = new PositionVoltage(0).withSlot(0);
 
-  /** Creates a new Arm. */
-  public Arm() {
+  public ArmIOTalonFX() {
     var talonFXConfigurator = armMotor.getConfigurator();
     var limitConfigs = new CurrentLimitsConfigs();
     var motorConfigs = new MotorOutputConfigs();
@@ -45,22 +38,13 @@ public class Arm extends SubsystemBase {
     armMotor.getConfigurator().apply(slot0Configs);
   }
 
-  public void armIn() {
-    final PositionVoltage armMotorRequest = new PositionVoltage(0).withSlot(0);
-    armMotor.setControl(armMotorRequest.withPosition(0.3));
-  }
+  public void updateInputs(ArmIOInputs inputs) {}
 
-  public void armOut() {
-    final PositionVoltage armMotorRequest = new PositionVoltage(0).withSlot(0);
-    armMotor.setControl(armMotorRequest.withPosition(-0.3));
+  public void setPosition(double position) {
+    armMotor.set(position);
   }
 
   public void stopArm() {
     armMotor.stopMotor();
-  }
-
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
   }
 }

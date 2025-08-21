@@ -7,9 +7,10 @@ import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import org.littletonrobotics.junction.Logger;
 
 public class RollerIOTalonFX implements RollerIO {
-  final TalonFX rollerMotor = new TalonFX(0, "rio");
+  final TalonFX rollerMotor = new TalonFX(10, "rio");
   VelocityVoltage rollerMotorRequest = new VelocityVoltage(0).withSlot(0);
 
   public RollerIOTalonFX() {
@@ -40,6 +41,7 @@ public class RollerIOTalonFX implements RollerIO {
 
   public void updateInputs(RollerIOInputs inputs) {
     inputs.velocity = rollerMotor.getVelocity().getValueAsDouble();
+    Logger.recordOutput("/Roller/Velocity", inputs.velocity);
   }
 
   public void setSpeed(double speed) {

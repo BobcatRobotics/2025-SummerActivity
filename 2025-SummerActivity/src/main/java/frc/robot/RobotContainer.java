@@ -14,19 +14,18 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.algaeRemover.AlgaeRemover;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.climber.Climber;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -47,13 +46,24 @@ public class RobotContainer {
   private final Drive drive;
   private final Roller roller;
   private final Arm arm = new Arm();
+  private final AlgaeRemover algaeRemover = new AlgaeRemover();
+  private final Climber climber = new Climber();
 
   private final Command setRollerFullSpeed;
   private final Command setRollerReverseFullSpeed;
   private final Command stopRoller;
-  private final Command armIn = new RunCommand(() -> arm.armIn());
-  private final Command armOut = new RunCommand(() -> arm.armOut());
-  private final Command stopArm = new InstantCommand(() -> arm.stopArm());
+  private final Command armIn;
+  private final Command armOut;
+  private final Command stopArm;
+  private final Command algaeRemoverForward;
+  private final Command algaeRemoverBackward;
+  private final Command algaeRemoverFullSpeed;
+  private final Command algaeRemoverReverseFullSpeed;
+  private final Command stopPositionMotor;
+  private final Command stopWheelMotor;
+  private final Command climberIn;
+  private final Command climberOut;
+  private final Command stopClimber;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -118,9 +128,22 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    setRollerFullSpeed = new RunCommand(() -> roller.setSpeed(25), roller);
-    setRollerReverseFullSpeed = new RunCommand(() -> roller.setSpeed(-25), roller);
+    setRollerFullSpeed = new RunCommand(() -> roller.setSpeed(100), roller);
+    setRollerReverseFullSpeed = new RunCommand(() -> roller.setSpeed(-100), roller);
     stopRoller = new InstantCommand(() -> roller.stopRoller());
+    armIn = new RunCommand(() -> arm.setPosition(-.19));
+    armOut = new RunCommand(() -> arm.setPosition(.177));
+    stopArm = new InstantCommand(() -> arm.stopArm());
+    algaeRemoverFullSpeed = new RunCommand(() -> algaeRemover.setSpeed(100), algaeRemover);
+    algaeRemoverReverseFullSpeed = new RunCommand(() -> algaeRemover.setSpeed(-100), algaeRemover);
+    algaeRemoverForward = new RunCommand(() -> algaeRemover.setSpeed(100), algaeRemover);
+    algaeRemoverBackward = new RunCommand(() -> algaeRemover.setSpeed(-100), algaeRemover);
+    stopPositionMotor = new InstantCommand(() -> algaeRemover.stopPositionMotor(), algaeRemover);
+    stopWheelMotor = new InstantCommand(() -> algaeRemover.stopWheelMotor(), algaeRemover);
+    climberIn = new RunCommand(() -> climber.setSpeed(1), climber);
+    climberOut = new RunCommand(() -> climber.setSpeed(-1), climber);
+    stopClimber = new RunCommand(() -> climber.stopClimber(), climber);
+
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -139,7 +162,7 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
-
+    /*
     // Lock to 0 when A button is held
     controller
         .a()
@@ -151,7 +174,7 @@ public class RobotContainer {
                 () -> new Rotation2d()));
 
     // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
+    //controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0 when B button is pressed
     controller
@@ -163,7 +186,7 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
-
+    */
     // Run roller forward when right trigger is pressed
     controller.rightTrigger().whileTrue(setRollerFullSpeed).onFalse(stopRoller);
 
@@ -175,6 +198,24 @@ public class RobotContainer {
 
     // Run arm backward when left bumper is pressed
     controller.leftBumper().whileTrue(armOut).onFalse(stopArm);
+
+    // Run algae remover wheel forward
+    controller.y().whileTrue(algaeRemoverFullSpeed).onFalse(stopWheelMotor);
+
+    // Run algae remover wheel backward
+    controller.x().whileTrue(algaeRemoverReverseFullSpeed).onFalse(stopWheelMotor);
+
+    // Run algae remover position forward
+    controller.a().whileTrue(algaeRemoverForward).onFalse(stopPositionMotor);
+
+    // Run algae remover position backward
+    controller.b().whileTrue(algaeRemoverBackward).onFalse(stopPositionMotor);
+
+    // Run climber in
+    controller.povUp().whileTrue(climberIn).onFalse(stopClimber);
+
+    // Run climber out
+    controller.povDown().whileTrue(climberOut).onFalse(stopClimber);
   }
 
   /**

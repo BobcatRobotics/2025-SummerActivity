@@ -1,27 +1,23 @@
-package frc.robot.subsystems.roller;
+package frc.robot.subsystems.arm;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.sim.TalonFXSimState;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import org.littletonrobotics.junction.Logger;
 
-public class RollerIOSimulation implements RollerIO {
-  final TalonFX rollerMotor = new TalonFX(0, "rio");
-  VelocityVoltage rollerMotorRequest = new VelocityVoltage(0).withSlot(0);
-
-  private double targetVelocityRadPerSec = 0.0;
+public class ArmIOSimulation implements ArmIO {
+  final TalonFX armMotor = new TalonFX(0, "rio");
+  // create a position closed-loop request, voltage output, slot 0 configs
+  final PositionVoltage armMotorRequest = new PositionVoltage(0).withSlot(0);
 
   // Simulation
   private final TalonFXSimState simState;
@@ -46,66 +42,50 @@ public class RollerIOSimulation implements RollerIO {
   private double driveFFVolts = 0.0;
   private double driveAppliedVolts = 0.0;
 
-  public RollerIOSimulation() {
-    var talonFXConfigurator = rollerMotor.getConfigurator();
+  public ArmIOSimulation() {
+    var talonFXConfigurator = armMotor.getConfigurator();
     var limitConfigs = new CurrentLimitsConfigs();
     var motorConfigs = new MotorOutputConfigs();
-    var feedbackConfigs = new FeedbackConfigs();
-
-    feedbackConfigs.SensorToMechanismRatio = 25;
 
     // enable stator current limit
     limitConfigs.StatorCurrentLimit = 20;
     limitConfigs.StatorCurrentLimitEnable = true;
 
-    // set invert mode to counter-clockwise
-    motorConfigs.Inverted = InvertedValue.CounterClockwise_Positive;
+    // set invert mode to clockwise
+    motorConfigs.Inverted = InvertedValue.Clockwise_Positive;
     motorConfigs.NeutralMode = NeutralModeValue.Coast;
 
     talonFXConfigurator.apply(limitConfigs);
     talonFXConfigurator.apply(motorConfigs);
-    talonFXConfigurator.apply(feedbackConfigs);
 
     var slot0Configs = new Slot0Configs();
-    slot0Configs.kP = 0.05; // An error of 1 rps results in 0.11 V output
+    slot0Configs.kG = 0; // To overcome gravity
+    slot0Configs.kP = 0.11; // An error of 1 rps results in 0.11 V output
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0; // no output for error derivative
 
-    rollerMotor.getConfigurator().apply(slot0Configs);
+    armMotor.getConfigurator().apply(slot0Configs);
 
-    simState = rollerMotor.getSimState();
+    simState = armMotor.getSimState();
 
     driveSim =
         new DCMotorSim(LinearSystemId.createDCMotorSystem(DRIVE_GEARBOX, 0.001, 25), DRIVE_GEARBOX);
   }
 
-  public void updateInputs(RollerIOInputs inputs) {
+  public void updateInputs(ArmIOInputs inputs) {
     if (driveClosedLoop) {
       driveAppliedVolts =
           driveFFVolts + driveController.calculate(driveSim.getAngularVelocityRadPerSec());
     } else {
       driveController.reset();
     }
-
-    // Update simulation state
-    driveSim.setInputVoltage(MathUtil.clamp(driveAppliedVolts, -12.0, 12.0));
-    driveSim.update(0.02);
-
-    // Update drive inputs
-    inputs.velocity = driveSim.getAngularVelocityRadPerSec();
-    Logger.recordOutput("/Roller/Velocity", inputs.velocity);
-    Logger.recordOutput("/Roller/driveTarget", targetVelocityRadPerSec);
   }
 
-  public void setSpeed(double velocityRadPerSec) {
-    driveClosedLoop = true;
-    driveFFVolts = DRIVE_KS * Math.signum(velocityRadPerSec) + DRIVE_KV * velocityRadPerSec;
-    driveController.setSetpoint(velocityRadPerSec);
-    targetVelocityRadPerSec = velocityRadPerSec;
+  public void setPosition(double position) {
+    armMotor.setControl(armMotorRequest.withPosition(position));
   }
 
-  public void stopRoller() {
-    rollerMotor.stopMotor();
-    this.setSpeed(0);
+  public void stopArm() {
+    armMotor.stopMotor();
   }
 }
