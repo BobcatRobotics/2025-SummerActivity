@@ -187,6 +187,7 @@ public class RobotContainer {
     controller.rightBumper().whileTrue(armUpCommand).onFalse(armStopCommand);
     controller.leftBumper().whileTrue(armDownCommand).onFalse(armStopCommand);
 
+    //Test each subsystem individually and comment out the other due to same buttons
     Command rollCommand = new RunCommand(() -> roller.runRoller(Constants.RollerConstants.ROLLER_FAST_SPEEDOUT_IN_RADPERSEC));
     Command rollCommand2 = new RunCommand(() -> roller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEEDOUT_IN_RADPERSEC));
     Command rollStop = new RunCommand(()-> roller.stopRoller());
