@@ -16,6 +16,10 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.DriveMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.generated.TunerConstants;
@@ -104,6 +108,14 @@ public class Robot extends LoggedRobot {
   /** This function is called periodically during all modes. */
   @Override
   public void robotPeriodic() {
+    Logger.recordOutput("RobotPose", new Pose2d());
+    Logger.recordOutput("ZeroedComponentPoses", new Pose3d[] {new Pose3d()});
+    Logger.recordOutput(
+        "FinalComponentPoses",
+        new Pose3d[] {
+          new Pose3d(
+              -0.238, 0.0, 0.298, new Rotation3d(0.0, Math.sin(Timer.getTimestamp()) - 1.0, 0.0))
+        });
     // Optionally switch the thread to high priority to improve loop
     // timing (see the template project documentation for details)
     // Threads.setCurrentThreadPriority(true, 99);

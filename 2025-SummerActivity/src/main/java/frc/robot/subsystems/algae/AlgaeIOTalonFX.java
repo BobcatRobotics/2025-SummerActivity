@@ -25,9 +25,9 @@ public class AlgaeIOTalonFX implements AlgaeIO {
     armConfig.MotorOutput.NeutralMode = NeutralModeValue.Coast;
     armConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     armConfig.CurrentLimits.SupplyCurrentLimit = ArmConstants.ARM_MOTOR_CURRENT_LIMIT;
-    armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
+    armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = false;
     armConfig.SoftwareLimitSwitch.ForwardSoftLimitThreshold = ArmConstants.ARM_MIN_POSITION;
-    armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
+    armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = false;
     armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = ArmConstants.ARM_MAX_POSITION;
     armConfig.Feedback.SensorToMechanismRatio = 4;
     armMotor.getConfigurator().apply(armConfig);

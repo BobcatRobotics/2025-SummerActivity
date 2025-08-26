@@ -1,0 +1,25 @@
+{
+  "name": "2025 KitBot",
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    }
+  ],
+  "position": [
+    0,
+    0,
+    0
+  ],
+  "cameras": [],
+  "components": [
+    {
+      "zeroedRotations": [],
+      "zeroedPosition": [
+        0,
+        0,
+        0
+      ]
+    }
+  ]
+}

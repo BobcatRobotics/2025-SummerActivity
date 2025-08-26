@@ -29,7 +29,8 @@ public class DeAlgaefierIOTalonFX implements DeAlgaefierIO {
     armConfig.CurrentLimits.SupplyCurrentLimitEnable = true;
     armConfig.CurrentLimits.SupplyCurrentLimit = DealgaefierConstants.ARM_MOTOR_CURRENT_LIMIT;
     armConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    armConfig.CurrentLimits.StatorCurrentLimit = DealgaefierConstants.ARM_MOTOR_STATOR_CURRENT_LIMIT;
+    armConfig.CurrentLimits.StatorCurrentLimit =
+        DealgaefierConstants.ARM_MOTOR_STATOR_CURRENT_LIMIT;
     armConfig.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
     armConfig.SoftwareLimitSwitch.ReverseSoftLimitThreshold = DealgaefierConstants.ARM_MIN_POSITION;
     armConfig.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;

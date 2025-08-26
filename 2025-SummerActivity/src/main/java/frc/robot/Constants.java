@@ -53,6 +53,8 @@ public final class Constants {
     public static final double ARM_MAX_POSITION = 0;
     public static final double ARM_MIN_POSITION = -33.44;
 
+    public static final double ARM_ROTATIONS_DEFAULT = 0.0005;
+
     // SOFT LIMITS for dealgaefier arm and arm
   }
 

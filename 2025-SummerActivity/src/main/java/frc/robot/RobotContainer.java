@@ -14,10 +14,12 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -31,6 +33,8 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -49,6 +53,8 @@ public class RobotContainer {
   // Dashboard inputs
   private final LoggedDashboardChooser<Command> autoChooser;
 
+  private Vision vision;
+
   // Algae Subsystem + Commands
   public final AlgaeSubsystem mAlgae = new AlgaeSubsystem();
   public Command rollerInCommand =
@@ -57,10 +63,13 @@ public class RobotContainer {
       new InstantCommand(() -> mAlgae.runRoller(Constants.RollerConstants.ROLLER_SPEED_OUT));
   public Command rollerStopCommand = new InstantCommand(() -> mAlgae.stopRoller());
 
+  public Command armDefaultCommand =
+      new RunCommand(() -> mAlgae.runArm(Constants.ArmConstants.ARM_ROTATIONS_DEFAULT));
   public Command armDeployCommand =
       new InstantCommand(() -> mAlgae.runArm(Constants.ArmConstants.ARM_ROTATIONS_DEPLOY));
   public Command armStowCommand =
       new InstantCommand(() -> mAlgae.runArm(Constants.ArmConstants.ARM_ROTATIONS_STOW));
+  ;
   public Command armStopCommand = new InstantCommand(() -> mAlgae.stopArm());
 
   // DeAlgaefier Subsystem + Commands
@@ -100,6 +109,9 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        vision =
+            new Vision(drive::addVisionMeasurement, new VisionIOLimelight("", drive::getRotation));
         break;
 
       case SIM:
@@ -124,6 +136,13 @@ public class RobotContainer {
                 new ModuleIO() {});
         break;
     }
+
+    // Set up named commands
+    NamedCommands.registerCommand("outtake", rollerOutCommand);
+    NamedCommands.registerCommand("stopouttake", rollerStopCommand);
+    NamedCommands.registerCommand("armout", armDeployCommand);
+    NamedCommands.registerCommand("armin", armStowCommand);
+    NamedCommands.registerCommand("stoparm", armStopCommand);
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -158,10 +177,11 @@ public class RobotContainer {
     // Default command, normal field-relative drive
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
-            drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
-            () -> -controller.getRightX()));
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX())
+            .alongWith(armDefaultCommand));
 
     // Lock to 0 when A button is held
     // controller
