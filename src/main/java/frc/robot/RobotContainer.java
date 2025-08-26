@@ -30,6 +30,9 @@ import frc.robot.subsystems.arm.ArmModuleIO;
 import frc.robot.subsystems.arm.ArmModuleSim;
 import frc.robot.subsystems.arm.ArmModuleReal;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.climber.ClimberReal;
+import frc.robot.subsystems.climber.ClimberSim;
+import frc.robot.subsystems.climber.ClimberSubsystem;
 //import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -40,6 +43,10 @@ import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.roller.RollerModuleIO;
 import frc.robot.subsystems.roller.RollerModuleReal;
 import frc.robot.subsystems.roller.RollerSubsystem;
+import frc.robot.subsystems.Vision.VisionIO;
+import frc.robot.subsystems.Vision.Vision;
+import frc.robot.subsystems.Vision.VisionConstants;
+import frc.robot.subsystems.Vision.VisionIOLimelight;
 //import frc.robot.subsystems.roller.RollerSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -54,6 +61,8 @@ public class RobotContainer {
   private final Drive drive;
   private final RollerSubsystem roller;
   private final ArmSubsystem arm;
+  private final ClimberSubsystem climber;
+  private Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -68,6 +77,7 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         arm = new ArmSubsystem(new ArmModuleReal(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "arm");
         roller = new RollerSubsystem(new RollerModuleReal(Constants.RollerConstants.ROLLER_MOTOR_ID,"rio"), "roller");
+        climber = new ClimberSubsystem(new ClimberReal(1, "ThriftyNova"),"climber");
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -75,12 +85,18 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        //Vision
+        vision = 
+          new Vision(drive::addVisionMeasurement, new VisionIOLimelight("", drive::getRotation));
+
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         arm = new ArmSubsystem(new ArmModuleSim(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
         roller = new RollerSubsystem(new RollerModuleReal(9, "rio"), "roller");
+        climber = new ClimberSubsystem(new ClimberReal(1, "ThriftyNova"), "climber");
         drive =
             new Drive(
                 new GyroIO() {},
@@ -193,6 +209,12 @@ public class RobotContainer {
     Command rollStop = new RunCommand(()-> roller.stopRoller());
     controller.rightBumper().whileTrue(rollCommand).onFalse(rollStop);
     controller.leftBumper().whileTrue(rollCommand2).onFalse(rollStop);
+
+    Command climbCommand = new RunCommand(() -> climber.Climb(Constants.ClimberConstants.CLIMBER_SLOW));
+    Command ClimbCommands2 = new RunCommand(() -> climber.Climb(Constants.ClimberConstants.CLIMBER_FAST));
+    Command stopClimb = new RunCommand(()-> climber.stopClimb());
+    controller.rightBumper().whileTrue(climbCommand).onFalse(rollStop);
+    controller.leftBumper().whileTrue(ClimbCommands2).onFalse(rollStop);
 
   }
 

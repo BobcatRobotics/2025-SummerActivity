@@ -51,4 +51,7 @@ public final class Constants {
 public static final class ClimberConstants {
   public static final double CLIMBER_SUPPLY = 50;
   public static final double CLIMBER_STATOR = 50;
+  public static final double CLIMBER_FAST = -0.6;
+  public static final double CLIMBER_SLOW = 0.6;
+}
 }

@@ -4,6 +4,8 @@ import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.subsystems.climber.ClimberIO.ClimberInputs;
 import frc.robot.util.TunableDouble;
+import com.thethriftybot.ThriftyNova;
+import com.thethriftybot.ThriftyNova.CurrentType;
 
 public class ClimberReal {
   private final ThriftyNova motor;
@@ -15,11 +17,17 @@ public class ClimberReal {
   private TunableDouble kFF = new TunableDouble("/Climber/Config/FF", 0.00);
 
     public ClimberReal(int id, String bus){
-      motor = new ThriftyNova();
+      motor = new ThriftyNova(0);
       motor.setInverted(true);
       motor.setBrakeMode(true);
       motor.setMaxCurrent(CurrentType.STATOR, ClimberConstants.CLIMBER_STATOR);
       motor.setMaxCurrent(CurrentType.SUPPLY, ClimberConstants.CLIMBER_SUPPLY);
+      motor.pid0.setP(kP.get());
+      motor.pid0.setP(kI.get());
+      motor.pid0.setP(kD.get());
+      motor.pid0.setP(kFF.get());
+      motor.enableSoftLimits(false);
+      motor.setSoftLimits(revLimit.get(), forwardLimit.get());
     }
 
     public void changeInputs(ClimberInputs inputs) {
@@ -43,5 +51,34 @@ public class ClimberReal {
     public void Climb(double positionInRotations){
       //motor.setPercent(positionInRotations);  
     }
-    
+    public void stopClimber(double positionInRotations){
+      motor.stopMotor();
+      Climb(0);
+    }
+    public void periodic(){
+      if(kP.check()){
+        motor.pid0.setP(kP.get());
+      }
+      if(kI.check()){
+        motor.pid0.setI(kI.get());
+      }
+      if(kD.check()){
+        motor.pid0.setD(kD.get());
+      }
+      if(kFF.check()){
+        motor.pid0.setFF(kFF.get());
+      } 
+      if(revLimit.check() || forwardLimit.check()){
+        motor.setSoftLimits(revLimit.get(), forwardLimit.get());
+      }
+
+      Logger.recordOutput("/Climber/positionInDegrees", motor.getPosition());
+      Logger.recordOutput("/Climber/velocityInRotPerSec", motor.getVelocity());
+      Logger.recordOutput("/Climber/voltageInVolts", motor.getVoltage());
+      Logger.recordOutput("/Climber/statorCurrent", motor.getStatorCurrent());
+    }
+    public Pose2d getPose2D{
+      return;
+    }
+
 }
