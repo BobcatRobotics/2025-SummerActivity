@@ -55,7 +55,6 @@ public final class Constants {
 
     public static final double ARM_ROTATIONS_DEFAULT = 0.0005;
 
-    // SOFT LIMITS for dealgaefier arm and arm
   }
 
   public static final class ClimberConstants {
