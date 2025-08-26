@@ -60,7 +60,7 @@ public class AlgaeIOTalonFX implements AlgaeIO {
   }
 
   public void setRollerSpeed(double rollerSpeed) {
-    armMotor.set(rollerSpeed);
+    rollerMotor.setControl(rollerMotorRequest.withVelocity(rollerSpeed));
   }
 
   public void stopArm() {

@@ -4,19 +4,17 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.Slot1Configs;
-import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.robot.subsystems.arm.ArmIO.ArmIOInputs;
 
 public class AlgaeRemoverIOTalonFX implements AlgaeRemoverIO {
-  final TalonFX algaeRemoverPositionMotor = new TalonFX(0, "rio");
-  final TalonFX algaeRemoverWheelMotor = new TalonFX(0, "rio");
-  // create a position closed-loop request, voltage output, slot 0 configs
-  final PositionVoltage positionMotorRequest = new PositionVoltage(0).withSlot(0);
+  final TalonFX algaeRemoverPositionMotor = new TalonFX(11, "rio");
+  final TalonFX algaeRemoverWheelMotor = new TalonFX(12, "rio");
   // create a velocity closed-loop request, voltage output, slot 1 configs
-  final PositionVoltage wheelMotorRequest = new PositionVoltage(0).withSlot(1);
+  final VelocityVoltage wheelMotorRequest = new VelocityVoltage(0).withSlot(0);
 
   public AlgaeRemoverIOTalonFX() {
     var algaeRemoverPositionTalonFXConfigurator = algaeRemoverPositionMotor.getConfigurator();
@@ -35,7 +33,6 @@ public class AlgaeRemoverIOTalonFX implements AlgaeRemoverIO {
     algaeRemoverPositionTalonFXConfigurator.apply(motorConfigs);
 
     var slot0Configs = new Slot0Configs();
-    slot0Configs.kG = 0.05; // To overcome gravity
     slot0Configs.kP = 0.11; // An error of 1 rps results in 0.11 V output
     slot0Configs.kI = 0; // no output for integrated error
     slot0Configs.kD = 0; // no output for error derivative

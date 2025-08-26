@@ -14,6 +14,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -32,6 +33,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.vision.Vision;
+import frc.robot.subsystems.vision.VisionIO;
+import frc.robot.subsystems.vision.VisionIOLimelight;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -41,6 +45,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private Vision vision;
+
   // Subsystems
   private final Drive drive;
   // private final Roller roller = new Roller();
@@ -83,6 +89,9 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
+
+        vision =
+            new Vision(drive::addVisionMeasurement, new VisionIOLimelight("", drive::getRotation));
         break;
 
       case SIM:
@@ -104,6 +113,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
+        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
         break;
     }
 
@@ -126,21 +136,25 @@ public class RobotContainer {
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
 
-    setRollerFullSpeed = new RunCommand(() -> algae.setRollerSpeed(100), algae);
-    setRollerReverseFullSpeed = new RunCommand(() -> algae.setRollerSpeed(-100), algae);
+    setRollerFullSpeed = new RunCommand(() -> algae.setRollerSpeed(25), algae);
+    setRollerReverseFullSpeed = new RunCommand(() -> algae.setRollerSpeed(-25), algae);
     stopRoller = new InstantCommand(() -> algae.stopRoller());
     armIn = new RunCommand(() -> algae.setArmSpeed(-.19));
     armOut = new RunCommand(() -> algae.setArmSpeed(.177));
     stopArm = new InstantCommand(() -> algae.stopArm());
-    algaeRemoverFullSpeed = new RunCommand(() -> algaeRemover.setSpeed(100), algaeRemover);
-    algaeRemoverReverseFullSpeed = new RunCommand(() -> algaeRemover.setSpeed(-100), algaeRemover);
-    algaeRemoverForward = new RunCommand(() -> algaeRemover.setSpeed(100), algaeRemover);
-    algaeRemoverBackward = new RunCommand(() -> algaeRemover.setSpeed(-100), algaeRemover);
+    algaeRemoverFullSpeed = new RunCommand(() -> algaeRemover.setSpeed(10), algaeRemover);
+    algaeRemoverReverseFullSpeed = new RunCommand(() -> algaeRemover.setSpeed(-10), algaeRemover);
+    algaeRemoverForward = new RunCommand(() -> algaeRemover.setPosition(0.19), algaeRemover);
+    algaeRemoverBackward = new RunCommand(() -> algaeRemover.setPosition(-0.19), algaeRemover);
     stopPositionMotor = new InstantCommand(() -> algaeRemover.stopPositionMotor(), algaeRemover);
     stopWheelMotor = new InstantCommand(() -> algaeRemover.stopWheelMotor(), algaeRemover);
-    climberIn = new RunCommand(() -> climber.setSpeed(1), climber);
-    climberOut = new RunCommand(() -> climber.setSpeed(-1), climber);
+    climberIn = new RunCommand(() -> climber.setSpeed(0.6), climber);
+    climberOut = new RunCommand(() -> climber.setSpeed(-0.6), climber);
     stopClimber = new RunCommand(() -> climber.stopClimber(), climber);
+
+    // Named command for auto
+    NamedCommands.registerCommand("scoreCoral", setRollerFullSpeed);
+    NamedCommands.registerCommand("stopScoring", stopRoller);
 
     // Configure the button bindings
     configureButtonBindings();

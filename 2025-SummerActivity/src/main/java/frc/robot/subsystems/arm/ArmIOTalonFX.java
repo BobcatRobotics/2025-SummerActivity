@@ -3,6 +3,7 @@ package frc.robot.subsystems.arm;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
@@ -17,6 +18,7 @@ public class ArmIOTalonFX implements ArmIO {
     var talonFXConfigurator = armMotor.getConfigurator();
     var limitConfigs = new CurrentLimitsConfigs();
     var motorConfigs = new MotorOutputConfigs();
+    var softwareLimits = new SoftwareLimitSwitchConfigs();
 
     // enable stator current limit
     limitConfigs.StatorCurrentLimit = 20;
@@ -25,6 +27,12 @@ public class ArmIOTalonFX implements ArmIO {
     // set invert mode to clockwise
     motorConfigs.Inverted = InvertedValue.Clockwise_Positive;
     motorConfigs.NeutralMode = NeutralModeValue.Coast;
+
+    // software limits
+    softwareLimits.ForwardSoftLimitEnable = false;
+    softwareLimits.ForwardSoftLimitThreshold = 10;
+    softwareLimits.ReverseSoftLimitEnable = false;
+    softwareLimits.ReverseSoftLimitThreshold = 0;
 
     talonFXConfigurator.apply(limitConfigs);
     talonFXConfigurator.apply(motorConfigs);

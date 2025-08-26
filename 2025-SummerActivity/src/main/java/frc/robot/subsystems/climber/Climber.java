@@ -7,14 +7,12 @@
 
 package frc.robot.subsystems.climber;
 
-import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
 import org.littletonrobotics.junction.Logger;
 
 public class Climber extends SubsystemBase {
-  final TalonFX armMotor = new TalonFX(9, "rio");
   private final ClimberIO io;
   private final ClimberIOInputsAutoLogged inputs = new ClimberIOInputsAutoLogged();
   /** Creates a new Arm. */

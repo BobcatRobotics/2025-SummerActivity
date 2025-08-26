@@ -6,7 +6,7 @@ import com.thethriftybot.ThriftyNova.CurrentType;
 import frc.robot.subsystems.arm.ArmIO.ArmIOInputs;
 
 public class ClimberIOTalonFX implements ClimberIO {
-  final ThriftyNova climberMotor = new ThriftyNova(0);
+  final ThriftyNova climberMotor = new ThriftyNova(1);
   // create a position closed-loop request, voltage output, slot 0 configs
   final PositionVoltage armMotorRequest = new PositionVoltage(0).withSlot(0);
 
@@ -19,6 +19,9 @@ public class ClimberIOTalonFX implements ClimberIO {
 
     // set brake mode
     climberMotor.setBrakeMode(true);
+
+    climberMotor.enableSoftLimits(false);
+    climberMotor.setSoftLimits(0, 0);
   }
 
   public void updateInputs(ArmIOInputs inputs) {}
