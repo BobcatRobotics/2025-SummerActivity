@@ -48,4 +48,7 @@ public final class Constants {
     public static final int ARM_SWITCH_PORT = 0;
     public static final double ARM_MOTOR_STATOR_CURRENT_LIMIT = 10;
 }
+public static final class ClimberConstants {
+  public static final double CLIMBER_SUPPLY = 50;
+  public static final double CLIMBER_STATOR = 50;
 }
