@@ -25,16 +25,17 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.Dealgaefier;
-import frc.robot.subsystems.coral.arm.ArmSubsystem;
-import frc.robot.subsystems.coral.roller.RollerSubsystem;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.dealgaefier.Dealgaefier;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.roller.Roller;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -46,8 +47,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final RollerSubsystem rollerSubsystem;
-  private final ArmSubsystem armSubsystem;
+  private final Roller rollerSubsystem;
+  private final Arm armSubsystem;
   private final Dealgaefier dealgaefier;
   private final Climber climber;
 
@@ -95,9 +96,9 @@ public class RobotContainer {
     }
 
     // Setting roller subsystem
-    rollerSubsystem = new RollerSubsystem();
+    rollerSubsystem = new Roller();
     // Setting arm subsystem
-    armSubsystem = new ArmSubsystem();
+    armSubsystem = new Arm();
     // Setting dealgaefier subsystem
     dealgaefier = new Dealgaefier();
     // Setting climber subsystem

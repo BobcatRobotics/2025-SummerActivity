@@ -12,7 +12,9 @@
 // GNU General Public License for more details.
 
 package frc.robot;
-
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.thethriftybot.ThriftyNova.MotorType;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -23,6 +25,54 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class Constants {
   public static final Mode simMode = Mode.SIM;
   public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+
+  public static final class Arm{
+    public static int DeviceID = 9;
+    public static String Canbus = "rio";
+    public static InvertedValue MotorInverted = InvertedValue.Clockwise_Positive;
+    public static NeutralModeValue NeutralMode = NeutralModeValue.Coast;
+    public static int CurrentLimit = 57;
+    public static boolean CurrentLimitEnable = true;
+    public static double RotationsPerSecondCW = 0.177;
+    public static double RotationsPerSecondCCW = -0.19;
+  }
+  public static final class Roller{
+    public static int DeviceID = 10;
+    public static String Canbus = "rio";
+    public static int Velocity = 0;
+    public static InvertedValue MotorInverted = InvertedValue.Clockwise_Positive;
+    public static NeutralModeValue NeutralMode = NeutralModeValue.Coast;
+    public static int CurrentLimit = 57;
+    public static boolean CurrentLimitEnable = true;
+    public static double RotationsPerSecondCW = 60;
+    public static double RotationsPerSecondCCW = -60;
+  }
+  public static final class Climber{
+    public static int DeviceID = 10;
+    public static MotorType Type = MotorType.NEO;
+    public static int Velocity = 0;
+    public static boolean Inverted = true;
+    public static boolean BrakeMode = true;
+    public static int CurrentLimit = 50;
+    public static double Hook = 0.6;
+    public static double Release = -0.6;
+  }
+  public static final class Dealgaefier{
+    public static int Roller_DeviceID = 12;
+    public static int Arm_DeviceID = 11;
+    public static String Canbus = "rio";
+    public static int Velocity = 0;
+    public static int Roller_MechanicalRatio = 4;
+    public static int Arm_MechanicalRatio = 25;
+    public static InvertedValue MotorInverted = InvertedValue.Clockwise_Positive;
+    public static NeutralModeValue NeutralMode = NeutralModeValue.Coast;
+    public static int CurrentLimit = 57;
+    public static boolean CurrentLimitEnable = true;
+    public static double Roller_RotationsPerSecondCW = 60;
+    public static double Roller_RotationsPerSecondCCW = -60;
+    public static double Arm_RotationsPerSecondCW = 0.36;
+    public static double Arm_RotationsPerSecondCCW = -0.36;
+  }
 
   public static enum Mode {
     /** Running on a real robot. */
