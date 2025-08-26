@@ -19,5 +19,7 @@ public interface ClimberModuleIO {
   
     public default void runClimber(double positionInRotations) {};
   
-    public default void stopClimber() {};
+    public default void stopClimber() {}
+
+    public void periodic();;
   }  

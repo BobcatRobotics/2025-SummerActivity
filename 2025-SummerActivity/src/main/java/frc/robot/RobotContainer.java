@@ -26,6 +26,8 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.Arm.ArmSubsystem;
+import frc.robot.subsystems.drive.Climber.ClimberModuleReal;
+import frc.robot.subsystems.drive.Climber.ClimberSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
@@ -49,6 +51,7 @@ public class RobotContainer {
   private final RollerSubsystem roller;
   private final ArmSubsystem arm;
   private final AlgaeRemoverSubsystem algaeRemover;
+  private final ClimberSubsystem climber;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -95,6 +98,7 @@ public class RobotContainer {
     roller = new RollerSubsystem();
     arm = new ArmSubsystem();
     algaeRemover = new AlgaeRemoverSubsystem(new AlgaeRemoverModuleReal(11, 12, "rio"),"");
+    climber = new ClimberSubsystem(new ClimberModuleReal(9,"rio"),"");
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -183,23 +187,23 @@ public class RobotContainer {
         .whileTrue(new RunCommand(() -> arm.stowArm(), arm))
         .onFalse(Commands.runOnce(() -> arm.stopMotor(), arm));
 
-    controller
-        .povDown()
-        .whileTrue(
-            Commands.run(
-                () -> algaeRemover.runArm(-Constants.AlgaeRemoverConstants.ARM_SPEED_UP)))
-        .onFalse(
-            Commands.runOnce(
-                () -> algaeRemover.stopRoller()));
+    //controller
+     //   .povDown()
+     //   .whileTrue(
+     //       Commands.run(
+    //            () -> algaeRemover.runArm(-Constants.AlgaeRemoverConstants.ARM_SPEED_UP)))
+     //   .onFalse(
+     //       Commands.runOnce(
+     //           () -> algaeRemover.stopRoller()));
 
-    controller
-        .povUp()
-        .whileTrue(
-            Commands.run(
-                () -> algaeRemover.runArm(Constants.AlgaeRemoverConstants.ARM_SPEED_UP)))
-        .onFalse(
-            Commands.runOnce(
-                () -> algaeRemover.stopRoller()));
+    //controller
+     //   .povUp()
+       // .whileTrue(
+         //   Commands.run(
+           //     () -> algaeRemover.runArm(Constants.AlgaeRemoverConstants.ARM_SPEED_UP)))
+       // .onFalse(
+         //   Commands.runOnce(
+           //     () -> algaeRemover.stopRoller()));
 
     controller
         .povLeft()
@@ -218,6 +222,25 @@ public class RobotContainer {
                 .onFalse(
                     Commands.runOnce(
                         () -> algaeRemover.stopRoller()));     
+
+ controller
+    .povDown()
+    .whileTrue(
+                 Commands.run(
+                    () -> climber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_OUT)))
+                 .onFalse(
+                     Commands.runOnce(
+                      () -> climber.stopClimber()));
+                
+controller
+     .povUp()
+     .whileTrue(
+                    Commands.run(
+                      () -> climber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_IN)))
+                 .onFalse(
+                    Commands.runOnce(
+                      () -> climber.stopClimber()));
+                
     
   }
 
