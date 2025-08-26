@@ -1,4 +1,4 @@
-package frc.robot.subsystems.arm;
+package frc.robot.subsystems.algaeRemover;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -23,7 +23,7 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.subsystems.roller.RollerInterfaceIO.RollerModuleIOInputs;
 import frc.robot.subsystems.roller.RollerState;
-public class ArmIOReal implements ArmInterfaceIO{
+public class AlgaeRemoverIOReal implements AlgaeRemoverIO{
 
     private final TalonFX motor;
     private final StatusSignal<Angle> relativePosition;
@@ -38,7 +38,7 @@ public class ArmIOReal implements ArmInterfaceIO{
     private final PositionVoltage positionControl = new PositionVoltage(0);
     private final VelocityVoltage velocityControl = new VelocityVoltage(0);
   
-    public ArmIOReal(int id, String bus) {
+    public AlgaeRemoverIOReal(int id, String bus) {
       this.motor = new TalonFX(id, bus);
   
       config = new TalonFXConfiguration();
@@ -64,7 +64,7 @@ public class ArmIOReal implements ArmInterfaceIO{
     }
   
     @Override
-    public void updateInputs(ArmModuleIOInputs inputs) {
+    public void updateInputs(AlgaeRemoverModuleIOInputs inputs) {
       var motorStatus =
           BaseStatusSignal.refreshAll(
               relativePosition, motorVelocity, motorAppliedVolts, motorCurrent);
@@ -76,13 +76,23 @@ public class ArmIOReal implements ArmInterfaceIO{
       inputs.currentAmps = motorCurrent.getValueAsDouble();
   
       if (inputs.appliedVolts > 0) {
-        inputs.state = ArmState.FORWARD;
+        inputs.state = AlgaeRemoverArmState.FORWARD;
       } else if (inputs.appliedVolts < 0) {
-        inputs.state = ArmState.REVERSE;
+        inputs.state = AlgaeRemoverArmState.REVERSE;
       } else if (inputs.appliedVolts == 0) {
-        inputs.state = ArmState.IDLE;
+        inputs.state = AlgaeRemoverArmState.IDLE;
       } else {
-        inputs.state = ArmState.UNKNOWN;
+        inputs.state = AlgaeRemoverArmState.UNKNOWN;
+      }
+
+      if (inputs.appliedVolts > 0) {
+        inputs.state = AlgaeRemoverRollerState.FORWARD;
+      } else if (inputs.appliedVolts < 0) {
+        inputs.state = AlgaeRemoverRollerState.REVERSE;
+      } else if (inputs.appliedVolts == 0) {
+        inputs.state = AlgaeRemoverRollerState.IDLE;
+      } else {
+        inputs.state = AlgaeRemoverRollerState.UNKNOWN;
       }
     }
   
