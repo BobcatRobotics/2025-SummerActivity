@@ -3,7 +3,7 @@ package frc.robot.util;
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class TunableDouble {
-private final String key;
+  private final String key;
   private boolean configUpdate = false;
   private LoggedNetworkNumber value;
   private double last;

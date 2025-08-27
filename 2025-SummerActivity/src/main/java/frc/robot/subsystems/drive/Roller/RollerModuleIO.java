@@ -16,7 +16,6 @@ public interface RollerModuleIO {
     public RollerState state = RollerState.IDLE;
   }
 
-
   public default void updateInputs(RollerModuleIOInputs inputs) {}
 
   public default void runRoller(double speedInRadians) {}

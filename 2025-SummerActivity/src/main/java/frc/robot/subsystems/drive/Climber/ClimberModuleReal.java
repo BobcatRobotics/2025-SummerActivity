@@ -1,12 +1,10 @@
 package frc.robot.subsystems.drive.Climber;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.thethriftybot.ThriftyNova;
 import com.thethriftybot.ThriftyNova.CurrentType;
-
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.util.TunableDouble;
+import org.littletonrobotics.junction.Logger;
 
 public class ClimberModuleReal implements ClimberModuleIO {
 
@@ -50,11 +48,10 @@ public class ClimberModuleReal implements ClimberModuleIO {
     } else {
       inputs.state = ClimberState.UNKNOWN;
     }
-
   }
 
   public void runClimber(double positionInDegrees) {
-    Logger.recordOutput("/Climber/output",positionInDegrees);
+    Logger.recordOutput("/Climber/output", positionInDegrees);
     motor.setPercent(positionInDegrees);
   }
 
@@ -63,20 +60,20 @@ public class ClimberModuleReal implements ClimberModuleIO {
     runClimber(0);
   }
 
-  public void periodic(){
-    if(kP.check()){
+  public void periodic() {
+    if (kP.check()) {
       motor.pid0.setP(kP.get());
     }
-    if(kI.check()){
+    if (kI.check()) {
       motor.pid0.setI(kI.get());
     }
-    if(kD.check()){
+    if (kD.check()) {
       motor.pid0.setD(kD.get());
     }
-    if(kFF.check()){
+    if (kFF.check()) {
       motor.pid0.setFF(kFF.get());
-    } 
-    if(reverseLimit.check() || forwardLimit.check()){
+    }
+    if (reverseLimit.check() || forwardLimit.check()) {
       motor.setSoftLimits(reverseLimit.get(), forwardLimit.get());
     }
 

@@ -33,8 +33,8 @@ public class RollerModuleSim implements RollerModuleIO {
   private double simulatedPosition = 0.0;
   private double simulatedVelocity = 0.0;
   private double maxSimVelocity = 10.0;
-  private double maxAcceleration = 100.0; 
-  private final double simLoopPeriodSec = 0.02; 
+  private double maxAcceleration = 100.0;
+  private final double simLoopPeriodSec = 0.02;
 
   public RollerModuleSim(int id, String bus) {
 
@@ -54,8 +54,7 @@ public class RollerModuleSim implements RollerModuleIO {
     voltage = motor.getMotorVoltage();
     amps = motor.getStatorCurrent();
 
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0, position, velocity, voltage, amps);
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, position, velocity, voltage, amps);
     ParentDevice.optimizeBusUtilizationForAll(motor);
 
     simState = motor.getSimState();
@@ -63,9 +62,7 @@ public class RollerModuleSim implements RollerModuleIO {
 
   @Override
   public void updateInputs(RollerModuleIOInputs inputs) {
-    var motorStatus =
-        BaseStatusSignal.refreshAll(
-            position, velocity, voltage, amps);
+    var motorStatus = BaseStatusSignal.refreshAll(position, velocity, voltage, amps);
 
     inputs.connected = debouncer.calculate(motorStatus.isOK());
     inputs.positionRad = Units.rotationsToRadians(position.getValueAsDouble());
@@ -96,7 +93,7 @@ public class RollerModuleSim implements RollerModuleIO {
 
     simState.setRotorVelocity(simulatedVelocity);
     simState.setRawRotorPosition(simulatedPosition);
-    simState.setSupplyVoltage(12.0); 
+    simState.setSupplyVoltage(12.0);
     Logger.recordOutput("/Roller/velocityRotPerSec", simulatedVelocity);
   }
 

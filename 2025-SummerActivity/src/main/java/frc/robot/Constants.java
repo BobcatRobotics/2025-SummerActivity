@@ -54,7 +54,7 @@ public final class Constants {
     public static final double ARM_MOTOR_STATOR_CURRENT_LIMIT = 10;
   }
 
-  public static final class AlgaeRemoverConstants{
+  public static final class AlgaeRemoverConstants {
     public static final int ARM_ID = 11;
     public static final double ARM_STATOR_LIMIT = 10;
     public static final double ARM_SPEED_UP = -0.19;

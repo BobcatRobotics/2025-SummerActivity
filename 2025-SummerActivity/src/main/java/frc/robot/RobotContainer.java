@@ -25,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.drive.AlgaeRemover.AlgaeRemoverModuleReal;
+import frc.robot.subsystems.drive.AlgaeRemover.AlgaeRemoverSubsystem;
 import frc.robot.subsystems.drive.Arm.ArmSubsystem;
 import frc.robot.subsystems.drive.Climber.ClimberModuleReal;
 import frc.robot.subsystems.drive.Climber.ClimberSubsystem;
@@ -34,9 +36,9 @@ import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
-import frc.robot.subsystems.drive.AlgaeRemover.AlgaeRemoverModuleReal;
-import frc.robot.subsystems.drive.AlgaeRemover.AlgaeRemoverSubsystem;
 import frc.robot.subsystems.drive.Roller.RollerSubsystem;
+import frc.robot.subsystems.drive.Vision.Vision;
+import frc.robot.subsystems.drive.Vision.VisionIOLimelight;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -52,6 +54,7 @@ public class RobotContainer {
   private final ArmSubsystem arm;
   private final AlgaeRemoverSubsystem algaeRemover;
   private final ClimberSubsystem climber;
+  private Vision vision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -71,8 +74,12 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.FrontRight),
                 new ModuleIOTalonFX(TunerConstants.BackLeft),
                 new ModuleIOTalonFX(TunerConstants.BackRight));
-        break;
 
+        // vision implementation
+        vision =
+            new Vision(drive::addVisionMeasurement, new VisionIOLimelight("", drive::getRotation));
+
+        break;
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         drive =
@@ -97,8 +104,8 @@ public class RobotContainer {
     }
     roller = new RollerSubsystem();
     arm = new ArmSubsystem();
-    algaeRemover = new AlgaeRemoverSubsystem(new AlgaeRemoverModuleReal(11, 12, "rio"),"");
-    climber = new ClimberSubsystem(new ClimberModuleReal(9,"rio"),"");
+    algaeRemover = new AlgaeRemoverSubsystem(new AlgaeRemoverModuleReal(11, 12, "rio"), "");
+    climber = new ClimberSubsystem(new ClimberModuleReal(1, "rio"), "");
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -168,14 +175,13 @@ public class RobotContainer {
             Commands.run(
                 () -> roller.spin_roller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT), roller))
         .onFalse(Commands.runOnce(() -> roller.stop_motor(), roller));
-    
+
     controller
-         .rightTrigger()
+        .rightTrigger()
         .whileTrue(
             Commands.run(
                 () -> roller.spin_roller(Constants.RollerConstants.ROLLER_SPEED_IN), roller))
         .onFalse(Commands.runOnce(() -> roller.stop_motor(), roller));
-
 
     controller
         .rightBumper()
@@ -187,61 +193,43 @@ public class RobotContainer {
         .whileTrue(new RunCommand(() -> arm.stowArm(), arm))
         .onFalse(Commands.runOnce(() -> arm.stopMotor(), arm));
 
-    //controller
-     //   .povDown()
-     //   .whileTrue(
-     //       Commands.run(
-    //            () -> algaeRemover.runArm(-Constants.AlgaeRemoverConstants.ARM_SPEED_UP)))
-     //   .onFalse(
-     //       Commands.runOnce(
-     //           () -> algaeRemover.stopRoller()));
-
-    //controller
-     //   .povUp()
-       // .whileTrue(
-         //   Commands.run(
-           //     () -> algaeRemover.runArm(Constants.AlgaeRemoverConstants.ARM_SPEED_UP)))
-       // .onFalse(
-         //   Commands.runOnce(
-           //     () -> algaeRemover.stopRoller()));
+    controller
+        .povDown()
+        .whileTrue(
+            Commands.run(() -> algaeRemover.runArm(-Constants.AlgaeRemoverConstants.ARM_SPEED_UP)))
+        .onFalse(Commands.runOnce(() -> algaeRemover.stopArm()));
 
     controller
-        .povLeft()
+        .povUp()
         .whileTrue(
-                    Commands.run(
-                        () -> algaeRemover.runRoller(Constants.AlgaeRemoverConstants.ROLLER_SPEED_IN)))
-                .onFalse(
-                    Commands.runOnce(
-                        () -> algaeRemover.stopRoller()));
-        
-   controller
-        .povRight()
-        .whileTrue(
-                    Commands.run(
-                        () -> algaeRemover.runRoller(Constants.AlgaeRemoverConstants.ROLLER_SPEED_OUT)))
-                .onFalse(
-                    Commands.runOnce(
-                        () -> algaeRemover.stopRoller()));     
+            Commands.run(() -> algaeRemover.runArm(Constants.AlgaeRemoverConstants.ARM_SPEED_UP)))
+        .onFalse(Commands.runOnce(() -> algaeRemover.stopArm()));
 
- controller
-    .povDown()
-    .whileTrue(
-                 Commands.run(
-                    () -> climber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_OUT)))
-                 .onFalse(
-                     Commands.runOnce(
-                      () -> climber.stopClimber()));
-                
-controller
-     .povUp()
-     .whileTrue(
-                    Commands.run(
-                      () -> climber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_IN)))
-                 .onFalse(
-                    Commands.runOnce(
-                      () -> climber.stopClimber()));
-                
-    
+    // controller
+    //     .povLeft()
+    //     .whileTrue(
+    //         Commands.run(
+    //             () -> algaeRemover.runRoller(Constants.AlgaeRemoverConstants.ROLLER_SPEED_IN)))
+    //     .onFalse(Commands.runOnce(() -> algaeRemover.stopRoller()));
+
+    // controller
+    //     .povRight()
+    //     .whileTrue(
+    //         Commands.run(
+    //             () -> algaeRemover.runRoller(Constants.AlgaeRemoverConstants.ROLLER_SPEED_OUT)))
+    //     .onFalse(Commands.runOnce(() -> algaeRemover.stopRoller()));
+
+    // controller
+    //     .povDown()
+    //     .whileTrue(
+    //         Commands.run(() -> climber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_OUT)))
+    //     .onFalse(Commands.runOnce(() -> climber.stopClimber()));
+
+    // controller
+    //     .povUp()
+    //     .whileTrue(
+    //         Commands.run(() -> climber.runClimber(Constants.ClimberConstants.CLIMBER_SPEED_IN)))
+    //     .onFalse(Commands.runOnce(() -> climber.stopClimber()));
   }
 
   /**
@@ -251,5 +239,9 @@ controller
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public Pose2d getPose2d() {
+    return drive.getPose();
   }
 }

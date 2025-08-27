@@ -1,12 +1,10 @@
 package frc.robot.subsystems.drive.Climber;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.thethriftybot.ThriftyNova;
 import com.thethriftybot.ThriftyNova.CurrentType;
-
 import frc.robot.Constants.ClimberConstants;
 import frc.robot.util.TunableDouble;
+import org.littletonrobotics.junction.Logger;
 
 public class ClimberModuleSim implements ClimberModuleIO {
 
@@ -32,7 +30,7 @@ public class ClimberModuleSim implements ClimberModuleIO {
     motor.setSoftLimits(reverseLimit.get(), forwardLimit.get());
   }
 
-  @Override 
+  @Override
   public void updateInputs(ClimberModuleIOInputs inputs) {
     inputs.connected = true;
     inputs.positionRad = motor.getPosition();
@@ -76,7 +74,7 @@ public class ClimberModuleSim implements ClimberModuleIO {
     if (reverseLimit.check() || forwardLimit.check()) {
       motor.setSoftLimits(reverseLimit.get(), forwardLimit.get());
     }
-    
+
     Logger.recordOutput("/Climber/positionInDegrees", motor.getPosition());
     Logger.recordOutput("/Climber/velocityInRotPerSec", motor.getVelocity());
     Logger.recordOutput("/Climber/voltageInVolts", motor.getVoltage());

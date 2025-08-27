@@ -1,12 +1,11 @@
 package frc.robot.subsystems.drive.Climber;
 
-import org.littletonrobotics.junction.Logger;
-
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import org.littletonrobotics.junction.Logger;
 
-public class ClimberSubsystem extends SubsystemBase{
+public class ClimberSubsystem extends SubsystemBase {
   private ClimberModuleIO io;
   private ClimberModuleIOInputsAutoLogged inputs = new ClimberModuleIOInputsAutoLogged();
   private final Alert motorDisconnectedAlert = new Alert("disconnected", AlertType.kWarning);

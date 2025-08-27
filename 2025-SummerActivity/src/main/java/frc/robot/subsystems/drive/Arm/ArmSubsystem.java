@@ -9,8 +9,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class ArmSubsystem extends SubsystemBase {
   private final TalonFX armMotor = new TalonFX(9, "rio"); // assuming id is 1
   // Setpoint positions (in rotations)
-  //private final double kExtendedPosition = 500.0;
-  //private final double kStowedPosition = 0.0;
+  // private final double kExtendedPosition = 500.0;
+  // private final double kStowedPosition = 0.0;
 
   public ArmSubsystem() {
     TalonFXConfiguration config = new TalonFXConfiguration();

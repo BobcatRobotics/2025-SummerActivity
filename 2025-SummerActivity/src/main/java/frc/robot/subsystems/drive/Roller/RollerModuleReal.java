@@ -3,8 +3,8 @@ package frc.robot.subsystems.drive.Roller;
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
-//import com.ctre.phoenix6.controls.DutyCycleOut;
-//import com.ctre.phoenix6.controls.PositionVoltage;
+// import com.ctre.phoenix6.controls.DutyCycleOut;
+// import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -29,8 +29,8 @@ public class RollerModuleReal implements RollerModuleIO {
   private final Debouncer debouncer = new Debouncer(0.5);
   private final TalonFXConfiguration config;
 
- // private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
- // private final PositionVoltage positionControl = new PositionVoltage(0);
+  // private final DutyCycleOut dutyCycleOut = new DutyCycleOut(0);
+  // private final PositionVoltage positionControl = new PositionVoltage(0);
   private final VelocityVoltage velocityControl = new VelocityVoltage(0);
 
   public RollerModuleReal(int id, String bus) {
@@ -50,16 +50,13 @@ public class RollerModuleReal implements RollerModuleIO {
     voltage = motor.getMotorVoltage();
     amps = motor.getStatorCurrent();
 
-    BaseStatusSignal.setUpdateFrequencyForAll(
-        50.0, position, velocity, voltage, amps);
+    BaseStatusSignal.setUpdateFrequencyForAll(50.0, position, velocity, voltage, amps);
     ParentDevice.optimizeBusUtilizationForAll(motor);
   }
 
   @Override
   public void updateInputs(RollerModuleIOInputs inputs) {
-    var motorStatus =
-        BaseStatusSignal.refreshAll(
-            position, velocity, voltage, amps);
+    var motorStatus = BaseStatusSignal.refreshAll(position, velocity, voltage, amps);
 
     inputs.connected = debouncer.calculate(motorStatus.isOK());
     inputs.positionRad = Units.rotationsToRadians(position.getValueAsDouble());
