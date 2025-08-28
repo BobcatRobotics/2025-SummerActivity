@@ -4,14 +4,20 @@
 
 package frc.robot.subsystems.climber;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.thethriftybot.ThriftyNova;
+import com.thethriftybot.ThriftyNova.CurrentType;
 
-public class ClimberThriftyNova extends SubsystemBase {
-  /** Creates a new ClimberThriftyNova. */
-  public ClimberThriftyNova() {}
+import frc.robot.Constants;
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+public final class ClimberThriftyNova{
+  final static ThriftyNova climberThriftyNova = new ThriftyNova(Constants.Climber.DeviceID, Constants.Climber.Type);  
+      public static final class Motor{
+        public static ThriftyNova MotorName = climberThriftyNova;
+    }
+  public ClimberThriftyNova(){
+    climberThriftyNova.setMaxCurrent(CurrentType.STATOR, Constants.Climber.CurrentLimit);
+    climberThriftyNova.setMaxCurrent(CurrentType.SUPPLY, Constants.Climber.CurrentLimit);
+    climberThriftyNova.setInverted(Constants.Climber.Inverted);
+    climberThriftyNova.setBrakeMode(Constants.Climber.BrakeMode);
   }
 }

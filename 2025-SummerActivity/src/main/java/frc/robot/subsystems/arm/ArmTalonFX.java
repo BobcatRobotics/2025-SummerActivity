@@ -4,14 +4,33 @@
 
 package frc.robot.subsystems.arm;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import frc.robot.Constants;
 
-public class ArmTalonFX extends SubsystemBase {
-  /** Creates a new ArmTalonFX. */
-  public ArmTalonFX() {}
+public final class ArmTalonFX{
+  final static TalonFX armTalonFX = new TalonFX(Constants.Arm.DeviceID, Constants.Arm.Canbus);
+  public static final class Motor{
+    public static TalonFX MotorName = armTalonFX;
+  }
+  public ArmTalonFX(){
+    TalonFXConfiguration motor_config = new TalonFXConfiguration();
+    motor_config.MotorOutput.Inverted = Constants.Arm.MotorInverted;
+    motor_config.MotorOutput.NeutralMode = Constants.Arm.NeutralMode;
+    motor_config.CurrentLimits.StatorCurrentLimit = Constants.Arm.CurrentLimit;
+    motor_config.CurrentLimits.StatorCurrentLimitEnable = Constants.Arm.CurrentLimitEnable;
+    motor_config.CurrentLimits.SupplyCurrentLimit = Constants.Arm.CurrentLimit;
+    motor_config.CurrentLimits.SupplyCurrentLimitEnable = Constants.Arm.CurrentLimitEnable;
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+    // Slot Configuration
+    var Slot0Configs = new Slot0Configs();
+    Slot0Configs.kP = 0.1;
+
+    // Add Slot Configuration to Motor Configuration
+    motor_config.Slot0 = Slot0Configs;
+
+    // Apply Configuration to TalonFX arm
+    armTalonFX.getConfigurator().apply(motor_config);
   }
 }

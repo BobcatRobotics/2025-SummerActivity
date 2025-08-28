@@ -9,13 +9,13 @@ import org.littletonrobotics.junction.AutoLog;
 public interface DealgaefierIO {
   @AutoLog
   public static class DealgaefierIOInputs{
-    public double armPosition = 0.0;
+    public double dealgaefierPosition = 0.0;
     
-    public double armVelocity = 0.0;
+    public double dealgaefierVelocity = 0.0;
 
-    public double armAppliedVolts = 0.0;
+    public double dealgaefierAppliedVolts = 0.0;
 
-    public double armCurrentAmps = 0.0;
+    public double dealgaefierCurrentAmps = 0.0;
   }
   public default void updateInputs(DealgaefierIOInputs inputs) {
     

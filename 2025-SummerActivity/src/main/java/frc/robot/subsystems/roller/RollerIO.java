@@ -9,13 +9,13 @@ import org.littletonrobotics.junction.AutoLog;
 public interface RollerIO {
   @AutoLog
   public static class RollerIOInputs{
-    public double armPosition = 0.0;
+    public double rollerPosition = 0.0;
     
-    public double armVelocity = 0.0;
+    public double rollerVelocity = 0.0;
 
-    public double armAppliedVolts = 0.0;
+    public double rollerAppliedVolts = 0.0;
 
-    public double armCurrentAmps = 0.0;
+    public double rollerCurrentAmps = 0.0;
   }
   public default void updateInputs(RollerIOInputs inputs) {
     

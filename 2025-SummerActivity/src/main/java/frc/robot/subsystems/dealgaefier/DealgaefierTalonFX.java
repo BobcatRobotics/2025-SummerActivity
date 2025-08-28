@@ -4,14 +4,43 @@
 
 package frc.robot.subsystems.dealgaefier;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.hardware.TalonFX;
+import frc.robot.Constants;
 
-public class DealgaefierTalonFX extends SubsystemBase {
-  /** Creates a new DealgaefierTalonFX. */
-  public DealgaefierTalonFX() {}
+public final class DealgaefierTalonFX{
+  final static TalonFX dealgaefierTalonFX = new TalonFX(Constants.Arm.DeviceID, Constants.Arm.Canbus);
+  public static final class Motor{
+    public static TalonFX MotorName = dealgaefierTalonFX;
+  }
+  public DealgaefierTalonFX(){
+    TalonFXConfiguration motor_config = new TalonFXConfiguration();
+    motor_config.MotorOutput.Inverted = Constants.Dealgaefier.MotorInverted;
+    motor_config.MotorOutput.NeutralMode = Constants.Dealgaefier.NeutralMode;
+    motor_config.Feedback.SensorToMechanismRatio = Constants.Dealgaefier.Roller_MechanicalRatio;
+    motor_config.CurrentLimits.StatorCurrentLimit = Constants.Dealgaefier.CurrentLimit;
+    motor_config.CurrentLimits.StatorCurrentLimitEnable = Constants.Dealgaefier.CurrentLimitEnable;
+    motor_config.CurrentLimits.SupplyCurrentLimit = Constants.Dealgaefier.CurrentLimit;
+    motor_config.CurrentLimits.SupplyCurrentLimitEnable = Constants.Dealgaefier.CurrentLimitEnable;
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+    motor_config = new TalonFXConfiguration();
+    motor_config.MotorOutput.Inverted = Constants.Dealgaefier.MotorInverted;
+    motor_config.MotorOutput.NeutralMode = Constants.Dealgaefier.NeutralMode;
+    motor_config.Feedback.SensorToMechanismRatio = Constants.Dealgaefier.Arm_MechanicalRatio;
+    motor_config.CurrentLimits.StatorCurrentLimit = Constants.Dealgaefier.CurrentLimit;
+    motor_config.CurrentLimits.StatorCurrentLimitEnable = Constants.Dealgaefier.CurrentLimitEnable;
+    motor_config.CurrentLimits.SupplyCurrentLimit = Constants.Dealgaefier.CurrentLimit;
+    motor_config.CurrentLimits.SupplyCurrentLimitEnable = Constants.Dealgaefier.CurrentLimitEnable;
+
+    // Slot Configuration
+    var Slot0Configs = new Slot0Configs();
+    Slot0Configs.kP = 0.1;
+
+    // Add Slot Configuration to Motor Configuration
+    motor_config.Slot0 = Slot0Configs;
+
+    // Apply Configuration to TalonFX arm
+    dealgaefierTalonFX.getConfigurator().apply(motor_config);
   }
 }
