@@ -181,25 +181,25 @@ public class RobotContainer {
     // Spin algae roller counterclockwise when left pov is held down.
     controller
         .povLeft()
-        .whileTrue(new RunCommand(() -> dealgaefier.start_counterclockwise_roller()))
+        .whileTrue(new RunCommand(() -> dealgaefier.start_roller_counterclockwise()))
         .onFalse(new RunCommand(() -> dealgaefier.stop_roller()));
 
     // Spin algae roller clockwise when right pov is held down.
     controller
         .povRight()
-        .whileTrue(new RunCommand(() -> dealgaefier.start_clockwise_roller()))
+        .whileTrue(new RunCommand(() -> dealgaefier.start_roller_clockwise()))
         .onFalse(new RunCommand(() -> dealgaefier.stop_roller()));
 
     // Spin algae arm clockwise when up pov is held down.
     controller
         .povUp()
-        .whileTrue(new RunCommand(() -> dealgaefier.start_clockwise_arm()))
+        .whileTrue(new RunCommand(() -> dealgaefier.start_arm_clockwise()))
         .onFalse(new RunCommand(() -> dealgaefier.stop_arm()));
 
     // Spin algae arm counterclockwise when down pov is held down.
     controller
         .povDown()
-        .whileTrue(new RunCommand(() -> dealgaefier.start_counterclockwise_arm()))
+        .whileTrue(new RunCommand(() -> dealgaefier.start_arm_counterclockwise()))
         .onFalse(new RunCommand(() -> dealgaefier.stop_arm()));
 
     // Hook climber to cage when X is pressed.
