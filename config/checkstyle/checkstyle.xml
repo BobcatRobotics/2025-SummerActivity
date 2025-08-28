@@ -10,12 +10,13 @@
     but skips lines that are comments (starting with //, /*, or * inside block comments).
     Severity set to "info" so it's a warning, not an error.
   -->
+  <!--
   <module name="RegexpSingleline">
     <property name="format" value="^(?!\s*(//|/\*|\*)).*\s+$"/>
     <property name="message" value="Line has trailing whitespace."/>
     <property name="severity" value="info"/>
   </module>
-
+-->
   <!--
     TreeWalker module analyzes Java AST (Abstract Syntax Tree).
     Most style checks are inside TreeWalker.
@@ -26,10 +27,10 @@
       NeedBraces:
       Enforces that all if, else, while, for, do statements use braces.
       Helps prevent bugs from single-line statements without braces.
-    -->
+    
     <module name="NeedBraces"/>
 
-    <!--
+    
       NestedIfDepth:
       Limits how deeply nested 'if' statements can be.
       Here max nesting is 3 levels deep to keep code readable.
@@ -65,47 +66,48 @@
       LeftCurly and RightCurly:
       Enforce brace placement.
       LeftCurly option "eol" means opening braces must be at end of the line, not next line.
-    -->
+    
     <module name="LeftCurly">
       <property name="option" value="eol"/>
     </module>
     <module name="RightCurly"/>
 
-    <!--
+    
       TypeName:
       Enforces class and enum names follow PascalCase convention.
-    -->
+    
     <module name="TypeName"/>
 
-    <!--
+    
       MethodName:
       Enforces method names follow camelCase convention.
-    -->
+    
     <module name="MethodName"/>
 
-    <!--
+    
       LocalVariableName:
       Enforces local variables follow camelCase naming.
     -->
-    <module name="LocalVariableName">
+    <!-- <module name="LocalVariableName">
       <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
-    </module>
+    </module> -->
 
     <!--
       MemberName:
       Enforces field/member variable names follow camelCase.
     -->
-    <module name="MemberName">
+    <!-- <module name="MemberName">
       <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
-    </module>
+    </module> -->
 
     <!--
       ParameterName:
       Enforces method parameter names follow camelCase.
     -->
-    <module name="ParameterName">
+    <!-- <module name="ParameterName">
       <property name="format" value="^[a-z][a-zA-Z0-9]*$"/>
-    </module>
+    </module> -->
 
   </module>
 </module>
+

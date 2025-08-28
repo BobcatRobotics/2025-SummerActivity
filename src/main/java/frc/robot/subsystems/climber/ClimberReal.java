@@ -35,7 +35,7 @@ public class ClimberReal implements ClimberIO{
       inputs.positionRad = motor.getPosition();
       inputs.velocityRadPerSec = motor.getVelocity();
       inputs.appliedVolts = motor.getVoltage();
-      inputs.Amps = motor.getStatorCurrent();
+      inputs.currentAmps = motor.getStatorCurrent();
   
       if (inputs.appliedVolts > 0) {
         inputs.state = ClimberState.FORWARD;

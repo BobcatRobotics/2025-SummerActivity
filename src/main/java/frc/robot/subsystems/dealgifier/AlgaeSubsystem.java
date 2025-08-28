@@ -18,11 +18,11 @@ public class AlgaeSubsystem extends SubsystemBase {
     Logger.processInputs(name, inputs);
     
   }
-  public void AlgaeRollMotor(double positionInRotations){
-    io.AlgaeRollMotor(positionInRotations);
+  public void algaeRollMotor(double positionInRotations){
+    io.algaeRollMotor(positionInRotations);
   }
-  public void AlgaeExtendArm(double positionInRotations){
-    io.AlgaeExtendArm(positionInRotations);
+  public void algaeExtendArm(double positionInRotations){
+    io.algaeExtendArm(positionInRotations);
   }
   public void stopArmMotor(){
     io.stopArmMotor();

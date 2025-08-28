@@ -101,11 +101,8 @@ public class RobotContainer {
                 new ModuleIOTalonFX(TunerConstants.BackRight));
 
         //Vision
-        vision = 
-          new Vision(drive::addVisionMeasurement, new VisionIOLimelight("", drive::getRotation));
-
+        vision = new Vision(drive::addVisionMeasurement, new VisionIOLimelight("", drive::getRotation));
         break;
-
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         arm = new ArmSubsystem(new ArmModuleSim(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
@@ -138,8 +135,6 @@ public class RobotContainer {
         break;
     
     }
-    
-    
 
       // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -228,18 +223,18 @@ public class RobotContainer {
     controller.rightBumper().whileTrue(rollCommand).onFalse(rollStop);
     controller.leftBumper().whileTrue(rollCommand2).onFalse(rollStop);
 
-    Command climbCommand = new RunCommand(() -> climber.Climb(Constants.ClimberConstants.CLIMBER_SLOW));
-    Command ClimbCommands2 = new RunCommand(() -> climber.Climb(Constants.ClimberConstants.CLIMBER_FAST));
+    Command climbCommand = new RunCommand(() -> climber.climb(Constants.ClimberConstants.CLIMBER_SLOW));
+    Command climbCommands2 = new RunCommand(() -> climber.climb(Constants.ClimberConstants.CLIMBER_FAST));
     Command stopClimb = new RunCommand(()-> climber.stopClimber());
     controller.rightBumper().whileTrue(climbCommand).onFalse(stopClimb);
-    controller.leftBumper().whileTrue(ClimbCommands2).onFalse(stopClimb);
+    controller.leftBumper().whileTrue(climbCommands2).onFalse(stopClimb);
 
-    Command AlgaeArm = new RunCommand(() -> algae.AlgaeExtendArm(Constants.ArmConstants.ARM_SPEED_UP));
-    Command AlgaeRoller = new RunCommand(() -> algae.AlgaeRollMotor(Constants.RollerConstants.ROLLER_FAST_SPEEDOUT_IN_RADPERSEC));
+    Command algaeArm = new RunCommand(() -> algae.algaeExtendArm(Constants.ArmConstants.ARM_SPEED_UP));
+    Command algaeRoller = new RunCommand(() -> algae.algaeRollMotor(Constants.RollerConstants.ROLLER_FAST_SPEEDOUT_IN_RADPERSEC));
     Command stopArm = new RunCommand(()-> algae.stopArmMotor());
     Command stopRoller = new RunCommand(()-> algae.stopRollerMotor());
-    controller.rightBumper().whileTrue(AlgaeArm).onFalse(stopArm);
-    controller.leftBumper().whileTrue(AlgaeRoller).onFalse(stopRoller);
+    controller.rightBumper().whileTrue(algaeArm).onFalse(stopArm);
+    controller.leftBumper().whileTrue(algaeRoller).onFalse(stopRoller);
 
   }
 

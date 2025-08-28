@@ -25,8 +25,8 @@ public interface AlgaeIO{
     public AlgaeStates armState = AlgaeStates.IDLE;
   }
   public default void changeInputs(AlgaeInputs inputs) {}
-  public default void AlgaeRollMotor(double positionInRotations) {}
-  public default void AlgaeExtendArm(double positionInRotations) {}
+  public default void algaeRollMotor(double positionInRotations) {}
+  public default void algaeExtendArm(double positionInRotations) {}
   public default void stopArmMotor() {}
   public default void stopRollerMotor() {}
 

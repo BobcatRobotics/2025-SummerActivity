@@ -20,7 +20,6 @@ public class RollerSubsystem extends SubsystemBase {
     this.io = io;
     this.name = name;
   }
-
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
@@ -30,7 +29,7 @@ public class RollerSubsystem extends SubsystemBase {
     motorDisconnectedAlert.set(!inputs.connected);
 
   }
-
+  
   public void runRoller(double speedInRadians) {
     io.Roll(speedInRadians);
   }

@@ -16,8 +16,8 @@ public class ClimberSubsystem extends SubsystemBase{
     io.changeInputs(inputs);
     Logger.processInputs(name, inputs);
   }
-  public void Climb(double positionInRotations) {
-    io.Climb(positionInRotations);
+  public void climb(double positionInRotations) {
+    io.climb(positionInRotations);
   }
   public void stopClimber() {
     io.stopClimber();
