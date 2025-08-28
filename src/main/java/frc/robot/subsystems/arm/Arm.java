@@ -9,23 +9,22 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Arm extends SubsystemBase {
   private ArmInterfaceIO io;
   private ArmModuleIOInputsAutoLogged inputs = new ArmModuleIOInputsAutoLogged();
   private final Alert motorDisconnectedAlert = new Alert("motor disconnected!", AlertType.kWarning);
-  private final String name;
   /** Creates a new roller. */
-  public Arm(ArmInterfaceIO io, String name) {
-    this.io = io;
-    this.name = name;
-  }
+  public Arm() {
+    this.io = new ArmIOReal(Constants.ArmConstants.ARM_MOTOR_ID, "rio");
+    }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     io.updateInputs(inputs);
-    Logger.processInputs(name, inputs);
+    Logger.processInputs("Arm", inputs);
     motorDisconnectedAlert.set(!inputs.connected);
   }
 

@@ -20,16 +20,27 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.algaeRemover.AlgaeRemover;
+import frc.robot.subsystems.algaeRemover.AlgaeRemoverIOReal;
+import frc.robot.subsystems.arm.Arm;
+import frc.robot.subsystems.climber.Climber;
+import frc.robot.subsystems.climber.ClimberIOReal;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
 import frc.robot.subsystems.drive.GyroIOPigeon2;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
+import frc.robot.subsystems.roller.Roller;
+import frc.robot.subsystems.roller.RollerIOReal;
+import frc.robot.Constants;
+
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -41,6 +52,18 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final Arm arm = new Arm();
+  private final Roller roller = new Roller(new RollerIOReal(Constants.RollerConstants.ROLLER_MOTOR_ID, "rio"), "Roller");
+  private final Climber climber = new Climber( new ClimberIOReal(Constants.ClimberConstants.CLIMBER_MOTOR_ID, "rio"), "Climber");
+  private final AlgaeRemover algaeRemover = new AlgaeRemover(new AlgaeRemoverIOReal(Constants.AlgaeRemoverConstants.ARM_ID, Constants.AlgaeRemoverConstants.ROLLER_ID, "rio"), "AlgeaRemover");
+
+  // Add commands
+  private final Command setRollerFullSpeed;
+  private final Command setRollerReverseFullSpeed;
+  private final Command stopRoller;
+  private final Command armIn;
+  private final Command armOut;
+  private final Command armStop;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -103,6 +126,13 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+
+    setRollerFullSpeed = new RunCommand(() -> roller.runRoller(Constants.RollerConstants.ROLLER_SPEED_IN), roller);
+    setRollerReverseFullSpeed = new RunCommand(() -> roller.runRoller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT_IN_RADPERSEC), roller);
+    stopRoller = new InstantCommand(() -> roller.stopRoller(), roller);
+    armIn = new RunCommand(() -> arm.runArm(Constants.ArmConstants.ARM_SPEED_UP), arm);
+    armOut = new RunCommand(() -> arm.runArm(Constants.ArmConstants.ARM_SPEED_DOWN), arm);
+    armStop = new InstantCommand(() -> arm.stopArm(), arm);
 
     // Configure the button bindings
     configureButtonBindings();
