@@ -11,7 +11,7 @@ public class AlgaeRemover extends SubsystemBase {
   private AlgaeRemoverIOInputsAutoLogged inputs = new AlgaeRemoverIOInputsAutoLogged();
   private final Alert motorDisconnectedAlert = new Alert("motor disconnected!", AlertType.kWarning);
   private final String name;
-  /** Creates a new roller. */
+  /** new roller. */
   public AlgaeRemover(AlgaeRemoverIO io, String name) {
     this.io = io;
     this.name = name;
@@ -19,7 +19,6 @@ public class AlgaeRemover extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
     io.updateInputs(inputs);
     Logger.processInputs(name, inputs);
     motorDisconnectedAlert.set(!inputs.connected);
