@@ -49,7 +49,7 @@ public class ClimberReal {
   
     }
     public void Climb(double positionInRotations){
-      //motor.setPercent(positionInRotations);  
+      motor.setPercent(positionInRotations);  
     }
     public void stopClimber(double positionInRotations){
       motor.stopMotor();
@@ -77,8 +77,6 @@ public class ClimberReal {
       Logger.recordOutput("/Climber/voltageInVolts", motor.getVoltage());
       Logger.recordOutput("/Climber/statorCurrent", motor.getStatorCurrent());
     }
-    public Pose2d getPose2D{
-      return;
-    }
+
 
 }

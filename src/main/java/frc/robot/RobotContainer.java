@@ -30,9 +30,13 @@ import frc.robot.subsystems.arm.ArmModuleIO;
 import frc.robot.subsystems.arm.ArmModuleSim;
 import frc.robot.subsystems.arm.ArmModuleReal;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.climber.ClimberSim;
 import frc.robot.subsystems.climber.ClimberSubsystem;
+import frc.robot.subsystems.dealgifier.AlgaeIO;
+import frc.robot.subsystems.dealgifier.AlgaeSubsystem;
+import frc.robot.subsystems.climber.ClimberIO.ClimberInputs;
 //import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -63,6 +67,7 @@ public class RobotContainer {
   private final ArmSubsystem arm;
   private final ClimberSubsystem climber;
   private Vision vision;
+  private final AlgaeSubsystem algae;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -77,7 +82,8 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         arm = new ArmSubsystem(new ArmModuleReal(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "arm");
         roller = new RollerSubsystem(new RollerModuleReal(Constants.RollerConstants.ROLLER_MOTOR_ID,"rio"), "roller");
-        climber = new ClimberSubsystem(new ClimberReal(1, "ThriftyNova"),"climber");
+        climber = new ClimberSubsystem(new Climber(1, "ThriftyNova"),"climber");
+        algae = new AlgaeSubsystem(new Algae(), "algae");
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -96,7 +102,7 @@ public class RobotContainer {
         // Sim robot, instantiate physics sim IO implementations
         arm = new ArmSubsystem(new ArmModuleSim(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
         roller = new RollerSubsystem(new RollerModuleReal(9, "rio"), "roller");
-        climber = new ClimberSubsystem(new ClimberReal(1, "ThriftyNova"), "climber");
+        climber = new ClimberSubsystem(new ClimberReal(1, "rio"), "climber");
         drive =
             new Drive(
                 new GyroIO() {},
@@ -212,9 +218,16 @@ public class RobotContainer {
 
     Command climbCommand = new RunCommand(() -> climber.Climb(Constants.ClimberConstants.CLIMBER_SLOW));
     Command ClimbCommands2 = new RunCommand(() -> climber.Climb(Constants.ClimberConstants.CLIMBER_FAST));
-    Command stopClimb = new RunCommand(()-> climber.stopClimb());
-    controller.rightBumper().whileTrue(climbCommand).onFalse(rollStop);
-    controller.leftBumper().whileTrue(ClimbCommands2).onFalse(rollStop);
+    Command stopClimb = new RunCommand(()-> climber.stopClimber());
+    controller.rightBumper().whileTrue(climbCommand).onFalse(stopClimb);
+    controller.leftBumper().whileTrue(ClimbCommands2).onFalse(stopClimb);
+
+    Command AlgaeArm = new RunCommand(() -> algae.AlgaeExtendArm(Constants.ArmConstants.ARM_SPEED_UP));
+    Command AlgaeRoller = new RunCommand(() -> algae.AlgaeRollMotor(Constants.RollerConstants.ROLLER_FAST_SPEEDOUT_IN_RADPERSEC));
+    Command stopArm = new RunCommand(()-> algae.stopArmMotor());
+    Command stopRoller = new RunCommand(()-> algae.stopRollerMotor());
+    controller.rightBumper().whileTrue(AlgaeArm).onFalse(stopArm);
+    controller.leftBumper().whileTrue(AlgaeRoller).onFalse(stopRoller);
 
   }
 
@@ -225,5 +238,9 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     return autoChooser.get();
+  }
+
+  public Pose2d getPose2D(){
+    return drive.getPose();
   }
 }

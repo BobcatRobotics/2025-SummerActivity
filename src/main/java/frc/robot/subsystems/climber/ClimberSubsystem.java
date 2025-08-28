@@ -19,7 +19,8 @@ public class ClimberSubsystem extends SubsystemBase{
   public void Climb(double positionInRotations) {
     io.Climb(positionInRotations);
   }
-  public void stopClimber(double positionInRotations) {
+  public void stopClimber() {
     io.stopClimber();
   }
+
 }

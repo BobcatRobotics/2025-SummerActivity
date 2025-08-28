@@ -2,6 +2,7 @@ package frc.robot.subsystems.dealgifier;
 
 import org.littletonrobotics.junction.AutoLog;
 
+
 public interface AlgaeIO{
   @AutoLog
   public static class AlgaeInputs {
@@ -23,7 +24,11 @@ public interface AlgaeIO{
     public AlgaeStates rollerState = AlgaeStates.IDLE;
     public AlgaeStates armState = AlgaeStates.IDLE;
   }
-
+  public default void changeInputs(AlgaeInputs inputs) {}
+  public default void AlgaeRollMotor(double positionInRotations) {}
+  public default void AlgaeExtendArm(double positionInRotations) {}
+  public default void stopArmMotor() {}
+  public default void stopRollerMotor() {}
 
 }
 
