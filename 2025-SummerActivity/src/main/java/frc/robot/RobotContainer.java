@@ -14,6 +14,7 @@
 package frc.robot;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -106,6 +107,13 @@ public class RobotContainer {
     arm = new ArmSubsystem();
     algaeRemover = new AlgaeRemoverSubsystem(new AlgaeRemoverModuleReal(11, 12, "rio"), "");
     climber = new ClimberSubsystem(new ClimberModuleReal(1, "rio"), "");
+
+    NamedCommands.registerCommand(
+        "RunRollerAuto",
+        Commands.run(
+                () -> roller.spin_roller(Constants.RollerConstants.ROLLER_SLOW_SPEED_OUT), roller)
+            .withTimeout(0.5)
+            .andThen(Commands.runOnce(() -> roller.stop_motor(), roller)));
 
     // Set up auto routines
     autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
