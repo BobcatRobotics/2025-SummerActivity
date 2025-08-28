@@ -54,7 +54,6 @@ public final class Constants {
     public static final double ARM_MIN_POSITION = -33.44;
 
     public static final double ARM_ROTATIONS_DEFAULT = 0.0005;
-
   }
 
   public static final class ClimberConstants {
