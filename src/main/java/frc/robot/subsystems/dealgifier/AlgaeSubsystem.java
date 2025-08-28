@@ -1,9 +1,9 @@
 package frc.robot.subsystems.dealgifier;
 
 import org.littletonrobotics.junction.Logger;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-
-public class AlgaeSubsystem {
+public class AlgaeSubsystem extends SubsystemBase {
 
   private final AlgaeIO io;
   private final String name;

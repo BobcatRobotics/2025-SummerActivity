@@ -14,9 +14,9 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import frc.robot.Constants;
-import frc.robot.subsystems.dealgifier.AlgaeIO.AlgaeInputs;
+//import frc.robot.subsystems.dealgifier.AlgaeIO.AlgaeInputs;
 
-public class Algae {
+public class Algae implements AlgaeIO{
 
   //Create Talon FX motor
   private final TalonFX armMotor;

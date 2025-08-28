@@ -2,12 +2,12 @@ package frc.robot.subsystems.climber;
 
 import org.littletonrobotics.junction.Logger;
 import frc.robot.Constants.ClimberConstants;
-import frc.robot.subsystems.climber.ClimberIO.ClimberInputs;
+//import frc.robot.subsystems.climber.ClimberIO.ClimberInputs;
 import frc.robot.util.TunableDouble;
 import com.thethriftybot.ThriftyNova;
 import com.thethriftybot.ThriftyNova.CurrentType;
 
-public class ClimberSim {
+public class ClimberSim implements ClimberIO{
   private final ThriftyNova motor;
   private TunableDouble revLimit = new TunableDouble("/Climber/config/revLimit", 0);
   private TunableDouble forwardLimit = new TunableDouble("/Climber/config/forwardLimit", 0);

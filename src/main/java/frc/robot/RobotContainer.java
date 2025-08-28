@@ -31,12 +31,16 @@ import frc.robot.subsystems.arm.ArmModuleSim;
 import frc.robot.subsystems.arm.ArmModuleReal;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.climber.ClimberIO;
+//import frc.robot.subsystems.climber.ClimberIO;
 import frc.robot.subsystems.climber.ClimberReal;
 import frc.robot.subsystems.climber.ClimberSim;
 import frc.robot.subsystems.climber.ClimberSubsystem;
+import frc.robot.subsystems.dealgifier.Algae;
 import frc.robot.subsystems.dealgifier.AlgaeIO;
+//import frc.robot.subsystems.dealgifier.AlgaeIO;
+import frc.robot.subsystems.dealgifier.AlgaeSIM;
 import frc.robot.subsystems.dealgifier.AlgaeSubsystem;
-import frc.robot.subsystems.climber.ClimberIO.ClimberInputs;
+//import frc.robot.subsystems.climber.ClimberIO.ClimberInputs;
 //import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.GyroIO;
@@ -46,10 +50,11 @@ import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOTalonFX;
 import frc.robot.subsystems.roller.RollerModuleIO;
 import frc.robot.subsystems.roller.RollerModuleReal;
+import frc.robot.subsystems.roller.RollerModuleSim;
 import frc.robot.subsystems.roller.RollerSubsystem;
-import frc.robot.subsystems.Vision.VisionIO;
+//import frc.robot.subsystems.Vision.VisionIO;
 import frc.robot.subsystems.Vision.Vision;
-import frc.robot.subsystems.Vision.VisionConstants;
+//import frc.robot.subsystems.Vision.VisionConstants;
 import frc.robot.subsystems.Vision.VisionIOLimelight;
 //import frc.robot.subsystems.roller.RollerSubsystem;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -67,7 +72,9 @@ public class RobotContainer {
   private final ArmSubsystem arm;
   private final ClimberSubsystem climber;
   private Vision vision;
-  private final AlgaeSubsystem algae;
+  private final AlgaeSubsystem algae ;
+  private final Algae algae2 = new Algae();
+  //public final AlgaeSIM algae3 = new AlgaeSIM();
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -82,8 +89,9 @@ public class RobotContainer {
         // Real robot, instantiate hardware IO implementations
         arm = new ArmSubsystem(new ArmModuleReal(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "arm");
         roller = new RollerSubsystem(new RollerModuleReal(Constants.RollerConstants.ROLLER_MOTOR_ID,"rio"), "roller");
-        climber = new ClimberSubsystem(new Climber(1, "ThriftyNova"),"climber");
-        algae = new AlgaeSubsystem(new Algae(), "algae");
+        climber = new ClimberSubsystem(new ClimberReal(1, "ThriftyNova"), "climber");
+        algae = new AlgaeSubsystem(algae2, "algae");
+
         drive =
             new Drive(
                 new GyroIOPigeon2(),
@@ -101,8 +109,10 @@ public class RobotContainer {
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
         arm = new ArmSubsystem(new ArmModuleSim(Constants.ArmConstants.ARM_MOTOR_ID, "rio"), "Arm");
-        roller = new RollerSubsystem(new RollerModuleReal(9, "rio"), "roller");
-        climber = new ClimberSubsystem(new ClimberReal(1, "rio"), "climber");
+        roller = new RollerSubsystem(new RollerModuleSim(9, "rio"), "roller");
+        climber = new ClimberSubsystem(new ClimberSim(1, "rio"), "climber");
+        algae = new AlgaeSubsystem(new AlgaeSIM(), "algae");
+
         drive =
             new Drive(
                 new GyroIO() {},
@@ -116,6 +126,8 @@ public class RobotContainer {
         // Replayed robot, disable IO implementations
         arm = new ArmSubsystem(new ArmModuleIO() {}, "arm");
         roller = new RollerSubsystem(new RollerModuleIO() {}, "roller");
+        climber = new ClimberSubsystem(new ClimberIO() {}, "climber");
+        algae = new AlgaeSubsystem(new AlgaeIO() {}, "algae");
         drive =
             new Drive(
                 new GyroIO() {},
